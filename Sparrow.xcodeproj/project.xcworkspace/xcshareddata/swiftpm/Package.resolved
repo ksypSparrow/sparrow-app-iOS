@@ -1,0 +1,33 @@
+{
+  "originHash" : "1b070fe9e3e5aa909f85020701629f97cf7c1e2ea3ca20471ea1b6d129c40436",
+  "pins" : [
+    {
+      "identity" : "sparrow-cold-storage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ksypSparrow/sparrow-cold-storage",
+      "state" : {
+        "revision" : "b03876916dcd484368ca5c3d6b2afbbf52eb51d4",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "sparrow-domain",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ksypSparrow/sparrow-domain",
+      "state" : {
+        "revision" : "953ccc31387493407cf8d290ace9e4be30b7e2f2",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "sparrow-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ksypSparrow/sparrow-kit",
+      "state" : {
+        "revision" : "cc6a12c0d44c54f1863db2fbc1d35bc9cba78c0b",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

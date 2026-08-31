@@ -1,0 +1,304 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A29F3C778EC54D62A2F6A979 /* SparrowDomain */; };
+		E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */ = {isa = PBXBuildFile; productRef = A561B186FC250430F1D14C2F /* ServiceContracts */; };
+		DEC0F1E299F44D8DCAB4777A /* Services in Frameworks */ = {isa = PBXBuildFile; productRef = 88B0E2F722A90E20634A2C3D /* Services */; };
+		D43B53BCDD3054D1E370C964 /* ColdStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 62928E19BB104EDF276DE340 /* ColdStorage */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		85673086EF6CFD3A1F8591AF /* Sparrow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sparrow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		67D99A50C43AB7AF1197937A /* Sparrow */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Sparrow; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7561BFB015D8F536760CB671 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */,
+				E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */,
+				DEC0F1E299F44D8DCAB4777A /* Services in Frameworks */,
+				D43B53BCDD3054D1E370C964 /* ColdStorage in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E50290A24C49A459B43487C5 = {
+			isa = PBXGroup;
+			children = (
+				67D99A50C43AB7AF1197937A /* Sparrow */,
+				328EC33DF3954DC9B83FA285 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		328EC33DF3954DC9B83FA285 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85673086EF6CFD3A1F8591AF /* Sparrow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0E8A3AD980EC179856012B7E /* Sparrow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B483F6EB73610DE752E457A0 /* Build configuration list for PBXNativeTarget "Sparrow" */;
+			buildPhases = (
+				BCE16DD0260827ECF338C787 /* Sources */,
+				7561BFB015D8F536760CB671 /* Frameworks */,
+				0189424A5A60FED329FA868E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				67D99A50C43AB7AF1197937A /* Sparrow */,
+			);
+			name = Sparrow;
+			packageProductDependencies = (
+				A29F3C778EC54D62A2F6A979 /* SparrowDomain */,
+				A561B186FC250430F1D14C2F /* ServiceContracts */,
+				88B0E2F722A90E20634A2C3D /* Services */,
+				62928E19BB104EDF276DE340 /* ColdStorage */,
+			);
+			productName = Sparrow;
+			productReference = 85673086EF6CFD3A1F8591AF /* Sparrow.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		98F54143AB4E86B28C3AFEE0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					0E8A3AD980EC179856012B7E = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = 41A2CC2D5321B7BB2E956CA5 /* Build configuration list for PBXProject "Sparrow" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E50290A24C49A459B43487C5;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */,
+				4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */,
+				9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 328EC33DF3954DC9B83FA285 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0E8A3AD980EC179856012B7E /* Sparrow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0189424A5A60FED329FA868E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BCE16DD0260827ECF338C787 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D08DD63EED508AD30D0CB0B4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_VERSION = 6.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		811CB99F7A296F7846C18A7F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_VERSION = 6.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FDA287C7C64DC2E983A802E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		88E6700796B683108D5F4889 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		41A2CC2D5321B7BB2E956CA5 /* Build configuration list for PBXProject "Sparrow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D08DD63EED508AD30D0CB0B4 /* Debug */,
+				811CB99F7A296F7846C18A7F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B483F6EB73610DE752E457A0 /* Build configuration list for PBXNativeTarget "Sparrow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDA287C7C64DC2E983A802E8 /* Debug */,
+				88E6700796B683108D5F4889 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ksypSparrow/sparrow-domain";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+		4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ksypSparrow/sparrow-cold-storage";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+		9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A29F3C778EC54D62A2F6A979 /* SparrowDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */;
+			productName = SparrowDomain;
+		};
+		A561B186FC250430F1D14C2F /* ServiceContracts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
+			productName = ServiceContracts;
+		};
+		88B0E2F722A90E20634A2C3D /* Services */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
+			productName = Services;
+		};
+		62928E19BB104EDF276DE340 /* ColdStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */;
+			productName = ColdStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
+}
