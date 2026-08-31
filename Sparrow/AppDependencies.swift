@@ -12,20 +12,41 @@ import Services
 enum AppDependencies {
     /// Set once, during `SparrowApp.init()`, before any scene or intent runs.
     private(set) nonisolated(unsafe) static var noteService: (any NoteServicing)?
+    private(set) nonisolated(unsafe) static var notebookService: (any NotebookServicing)?
+
+    /// Where the database lives. Application Support, not Documents — this is
+    /// app-managed state, not something a person files or opens themselves.
+    static var storeURL: URL {
+        URL.applicationSupportDirectory
+            .appending(path: "Sparrow", directoryHint: .isDirectory)
+            .appending(path: "sparrow.sqlite")
+    }
 
     static func register() throws {
-        // ColdStorage's only public entry point. `make(at:)` replaces this in
-        // M1; nothing else about this function changes when it does.
-        let storage = try ColdStorage.inMemory()
+        // M0 called `.inMemory()` here. This is the whole diff: one line, and
+        // nothing above it changed. That was the point of returning protocols.
+        let storage = try ColdStorage.make(at: storeURL)
 
-        let service = NoteService(
+        let notes = NoteService(
             notes: storage.notes,
             transactions: storage.transactions
         )
-        noteService = service
+        let notebooks = NotebookService(notebooks: storage.notebooks)
+        noteService = notes
+        notebookService = notebooks
 
-        // Registered as the protocol, not the actor. An intent that could name
-        // `NoteService` could reach past the contract it is supposed to use.
-        AppDependencyManager.shared.add(dependency: service as any NoteServicing)
+        // Registered as protocols, not as the actors. An intent that could
+        // name `NoteService` could reach past the contract it is meant to use.
+        AppDependencyManager.shared.add(dependency: notes as any NoteServicing)
+        AppDependencyManager.shared
+            .add(dependency: notebooks as any NotebookServicing)
+        // ⚠️ Not `add(dependency: Navigator.shared)`. That overload takes a
+        // `@Sendable` autoclosure, and `Navigator` is `@MainActor`, so the
+        // reference cannot be made from inside one. The async provider
+        // overload can hop to the main actor, and is the only form that
+        // compiles for a `@MainActor` dependency under Swift 6.
+        AppDependencyManager.shared.add {
+            await MainActor.run { Navigator.shared }
+        }
     }
 }
