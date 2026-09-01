@@ -33,6 +33,7 @@ enum AppDependencies {
 
         let notes = NoteService(
             notes: storage.notes,
+            notebooks: storage.notebooks,
             transactions: storage.transactions,
             relay: relay
         )

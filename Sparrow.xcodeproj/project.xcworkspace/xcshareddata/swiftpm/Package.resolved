@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ksypSparrow/sparrow-cold-storage",
       "state" : {
-        "revision" : "01afddc5988afb8c7efc7ffee485a81cd20db343",
-        "version" : "0.3.0"
+        "revision" : "4d3e31d00e5e3e8025fe6903e47281a7a9fc11b5",
+        "version" : "0.4.0"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ksypSparrow/sparrow-domain",
       "state" : {
-        "revision" : "2e24d8367def3120089a2fa6637bdb473d06319e",
-        "version" : "0.3.0"
+        "revision" : "bf0d0dd9ffb22acf371b5531926acad50ab02cd0",
+        "version" : "0.4.0"
       }
     },
     {
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ksypSparrow/sparrow-kit",
       "state" : {
-        "revision" : "8e3b6f2e6a888a03d72244467306496a2603792d",
-        "version" : "0.3.0"
+        "revision" : "85d25f56744d5a5069c5c92318565d99aaf512d3",
+        "version" : "0.4.0"
       }
     }
   ],

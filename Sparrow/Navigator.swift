@@ -16,10 +16,15 @@ final class Navigator {
     static let shared = Navigator()
 
     var selectedNotebookID: NotebookID?
+    var selectedNoteID: NoteID?
 
     private init() {}
 
     func select(_ id: NotebookID?) {
         selectedNotebookID = id
+    }
+
+    func select(note id: NoteID?) {
+        selectedNoteID = id
     }
 }

@@ -58,7 +58,13 @@ struct ContentView: View {
                 }
             }
         } detail: {
-            noteList
+            if let selected = model.notes.first(
+                where: { $0.id == navigator.selectedNoteID }
+            ) {
+                NoteDetailView(note: selected, model: model)
+            } else {
+                noteList
+            }
         }
         .task { await model.start() }
     }
@@ -94,12 +100,22 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                 }
                 ForEach(model.notes) { note in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(note.title)
-                        Text(note.createdAt, format: .dateTime.hour().minute())
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    NoteRow(note: note)
+                        .contentShape(.rect)
+                        .onTapGesture { navigator.select(note: note.id) }
+                        .swipeActions {
+                            Button("Delete", role: .destructive) {
+                                Task { await model.delete(note: note.id) }
+                            }
+                            Button(note.isPinned ? "Unpin" : "Pin") {
+                                Task {
+                                    await model.setPinned(
+                                        note.id, !note.isPinned
+                                    )
+                                }
+                            }
+                            .tint(.orange)
+                        }
                 }
             }
         }
@@ -186,6 +202,35 @@ final class NoteListModel {
         }
     }
 
+    func delete(note id: NoteID) async {
+        guard let noteService else { return }
+        await reportingFailure { try await noteService.delete(id) }
+        if Navigator.shared.selectedNoteID == id {
+            Navigator.shared.select(note: nil)
+        }
+    }
+
+    func setPinned(_ id: NoteID, _ pinned: Bool) async {
+        guard let noteService else { return }
+        await reportingFailure { try await noteService.setPinned(id, pinned) }
+    }
+
+    /// Saves both fields as one edit. `NoteEdit` names only what changed, so a
+    /// save that touched nothing writes nothing — the same rule the Shortcuts
+    /// action follows.
+    func save(_ id: NoteID, title: String, body: String) async {
+        guard let noteService else { return }
+        await reportingFailure {
+            try await noteService.update(
+                id,
+                with: NoteEdit(
+                    title: RichText(plain: title),
+                    body: RichText(plain: body)
+                )
+            )
+        }
+    }
+
     func delete(_ id: NotebookID) async {
         guard let notebookService else { return }
         await reportingFailure {
@@ -210,7 +255,9 @@ final class NoteListModel {
     func create(title: String) async {
         guard let noteService else { return }
         await reportingFailure {
-            try await noteService.create(NoteDraft(title: title))
+            try await noteService.create(
+                NoteDraft(title: RichText(plain: title))
+            )
         }
     }
 
@@ -234,6 +281,83 @@ final class NoteListModel {
     func reload() async {
         guard let noteService else { return }
         notes = (try? await noteService.recent(limit: 50)) ?? []
+    }
+}
+
+/// One line of the note list.
+///
+/// Draws `plainTitle`, not the attributed form. A list row does not need to
+/// decode attributes to show a title, which is exactly why storage keeps the
+/// plain copy in its own column.
+struct NoteRow: View {
+    let note: Note
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if note.isPinned {
+                Image(systemName: "pin.fill")
+                    .foregroundStyle(.orange)
+                    .font(.caption)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(note.plainTitle.isEmpty ? "Untitled note" : note.plainTitle)
+                if !note.plainBody.isEmpty {
+                    Text(note.plainBody)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            Text(note.happenedAt, format: .dateTime.day().month().hour().minute())
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+    }
+}
+
+/// The detail view for one note.
+///
+/// Edits go through `NoteServicing.update`, so the same `NoteEdit` semantics
+/// the Shortcuts action uses apply here: a field left alone stays alone.
+struct NoteDetailView: View {
+    let note: Note
+    let model: NoteListModel
+
+    @State private var title = ""
+    @State private var body_ = ""
+
+    var body: some View {
+        Form {
+            Section("Title") {
+                TextField("Title", text: $title)
+            }
+            Section("Note") {
+                TextField("Note", text: $body_, axis: .vertical)
+                    .lineLimit(4...)
+            }
+            Section {
+                LabeledContent("Kind", value: note.kind.rawValue.capitalized)
+                Toggle("Pinned", isOn: .init(
+                    get: { note.isPinned },
+                    set: { pinned in
+                        Task { await model.setPinned(note.id, pinned) }
+                    }
+                ))
+            }
+        }
+        .navigationTitle(note.plainTitle.isEmpty ? "Untitled" : note.plainTitle)
+        .toolbar {
+            Button("Save") {
+                Task { await model.save(note.id, title: title, body: body_) }
+            }
+        }
+        .onAppear {
+            // Seeds the fields once. The list itself never refreshes on
+            // appear — see `NoteListModel.start()`.
+            title = note.plainTitle
+            body_ = note.plainBody
+        }
     }
 }
 
