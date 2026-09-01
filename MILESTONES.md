@@ -16,6 +16,38 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M2 — notebook CRUD
+
+Verified against domain 0.3.0, cold-storage 0.3.0, kit 0.3.0.
+
+```
+   ✓  the sidebar updates with no explicit refresh call
+   ✓  deleting a non-empty notebook shows an actionable message
+   ✓  the metadata gate prints both processors
+   ✓  extract.actionsdata names all five intents
+   ~  the CRUD intents run from Shortcuts
+```
+
+### The refresh gate, structurally
+
+`loadNotebooks()` has exactly two call sites: once at launch, and once from
+`NotebookServicing.changes`. There is no `onAppear`, no `refreshable`, no
+`onChange` anywhere in the app. A write from any source in this process shows
+up because it was *announced*, not because a view happened to reappear.
+
+⚠️ **In this process.** The change broadcaster lives inside one `ColdStorage`
+instance, so a separate extension writing the same file would go unnoticed.
+Cross-process observation needs `DatabaseRegionObservation` or a Darwin
+notification, and is not in V1 — which will matter when a widget arrives.
+
+### No `.delete` in ConfirmationActionName
+
+🧪 `ConfirmationActionName` offers add · buy · create · open · send · set ·
+share · start · toggle and about twenty more, and **nothing destructive**.
+`DeleteNotebookIntent` therefore calls `requestConfirmation(dialog:)` without
+an action name, and the dialog carries the weight: the button says "Continue",
+so the sentence has to say what will happen.
+
 ## M1 — notebook picker
 
 Verified against domain 0.2.0, cold-storage 0.2.0, kit 0.2.0.

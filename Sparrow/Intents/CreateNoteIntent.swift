@@ -39,7 +39,7 @@ struct CreateNoteIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let note = try await notes.translatingErrors {
+        let note = try await translatingServiceErrors {
             try await notes.create(
                 NoteDraft(title: noteTitle, body: content ?? "")
             )
