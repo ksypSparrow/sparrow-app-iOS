@@ -16,6 +16,47 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M4 — text search
+
+Verified against domain 0.4.0, cold-storage 0.5.0, kit 0.5.0.
+
+```
+   ✓  searching "heron" finds "Herón"                         FR-1.3
+   ✓  NoteEntityQuery adopts EntityStringQuery
+   ✓  the metadata gate prints both processors; 9 intents extracted
+   ✓  on-device schema reaches v3_fts with remove_diacritics 2
+   ~  Siri: "Search Sparrow for waders"
+```
+
+### The capabilities bitfield, now decoded
+
+Three waves of evidence, each from building the same query two ways:
+
+```
+   bit 0 (1)   EnumerableEntityQuery    notebooks yes · notes no
+   bit 1 (2)   EntityQuery base         both
+   bit 2 (4)   EntityStringQuery        notes yes — new this wave
+   bit 6 (64)  common to both
+```
+
+`NoteEntityQuery` went **66 → 70** when it adopted `EntityStringQuery`.
+🧪 Verified, Xcode 27. This is now a cheap way to confirm a query conformance
+actually reached the system, rather than trusting that it compiled.
+
+### `entities(matching:)` runs the app's own search
+
+Siri resolving "my heron note" goes through `SearchServicing.search`, the same
+path the search field uses. So FR-1.3's diacritic folding applies to a spoken
+query too — someone who says "heron" reaches a note titled "Herón" without the
+intent layer knowing anything about tokenisers.
+
+### The search field is debounced by cancellation, not by a timer
+
+`.task(id: model.query)` tears down the previous search when the query changes,
+so the 150 ms sleep is only survived by the last keystroke. There is no timer
+to cancel and no state to reset — the structured-concurrency lifetime *is* the
+debounce.
+
 ## M3 — notes, entities and intents
 
 Verified against domain 0.4.0, cold-storage 0.4.0, kit 0.4.0.
