@@ -176,6 +176,7 @@ final class NoteListModel {
     private var searchService: (any SearchServicing)? {
         AppDependencies.searchService
     }
+    private var tagService: (any TagServicing)? { AppDependencies.tagService }
     private var notebookService: (any NotebookServicing)? {
         AppDependencies.notebookService
     }
@@ -234,6 +235,35 @@ final class NoteListModel {
             failure = error
         } catch {
             failure = .storageUnavailable
+        }
+    }
+
+    /// Ensures the tag exists, then appends it.
+    ///
+    /// Two steps, and they cannot be one: `ensure` is find-or-create in
+    /// storage, and appending is an edit to *this* note. A person typing a tag
+    /// that already exists is the common case, not an error.
+    func addTag(_ label: String, to id: NoteID) async {
+        guard let tagService, let noteService else { return }
+        await reportingFailure {
+            let tag = try await tagService.ensure(label)
+            guard let current = try await noteService.note(id),
+                  !current.tagIDs.contains(tag.id)
+            else { return }
+            try await noteService.update(
+                id, with: NoteEdit(tagIDs: current.tagIDs + [tag.id])
+            )
+        }
+    }
+
+    func removeTag(_ tagID: TagID, from id: NoteID) async {
+        guard let noteService else { return }
+        await reportingFailure {
+            guard let current = try await noteService.note(id) else { return }
+            try await noteService.update(
+                id,
+                with: NoteEdit(tagIDs: current.tagIDs.filter { $0 != tagID })
+            )
         }
     }
 
@@ -358,11 +388,35 @@ struct NoteRow: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
+                if !note.tagIDs.isEmpty {
+                    TagChips(tagIDs: note.tagIDs)
+                }
             }
             Spacer()
             Text(note.happenedAt, format: .dateTime.day().month().hour().minute())
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
+        }
+    }
+}
+
+/// The tags on a note, drawn as chips.
+///
+/// Shows the slug rather than the label: the note carries `TagID`s, and
+/// resolving each to its `Tag` would be a fetch per chip per row. The slug is
+/// what a person typed, normalised — close enough to read, and free.
+struct TagChips: View {
+    let tagIDs: [TagID]
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(tagIDs, id: \.slug) { id in
+                Text(id.slug)
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.tint.opacity(0.15), in: .capsule)
+            }
         }
     }
 }
@@ -377,6 +431,13 @@ struct NoteDetailView: View {
 
     @State private var title = ""
     @State private var body_ = ""
+    @State private var newTag = ""
+
+    private func addTag() {
+        let label = newTag
+        newTag = ""
+        Task { await model.addTag(label, to: note.id) }
+    }
 
     var body: some View {
         Form {
@@ -386,6 +447,22 @@ struct NoteDetailView: View {
             Section("Note") {
                 TextField("Note", text: $body_, axis: .vertical)
                     .lineLimit(4...)
+            }
+            Section("Tags") {
+                if !note.tagIDs.isEmpty {
+                    TagChips(tagIDs: note.tagIDs)
+                }
+                HStack {
+                    TextField("Add a tag", text: $newTag)
+                        .onSubmit(addTag)
+                    Button("Add", action: addTag)
+                        .disabled(newTag.isEmpty)
+                }
+                ForEach(note.tagIDs, id: \.slug) { id in
+                    Button("Remove \(id.slug)", systemImage: "minus.circle") {
+                        Task { await model.removeTag(id, from: note.id) }
+                    }
+                }
             }
             Section {
                 LabeledContent("Kind", value: note.kind.rawValue.capitalized)
