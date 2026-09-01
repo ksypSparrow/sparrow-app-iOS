@@ -16,6 +16,62 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M5 — Find action
+
+Verified against domain 0.5.0, cold-storage 0.6.0, kit 0.6.0.
+
+```
+   ✓  a Find action exists in Shortcuts                       FR-1.4
+   ✓  five properties and their comparators reach the metadata
+   ✓  sortable by title · updatedAt · observedAt
+   ✓  NoteEntityQuery adopts EntityPropertyQuery — 70 → 78
+   ~  "kind is observation AND created after 1 Aug, sorted by
+      updated descending" returns the right notes
+   ~  the result chains into another app's action
+```
+
+### The comparator type is `NoteFilter`, not `Predicate<NoteEntity>`
+
+Apple's Trails sample maps comparators to in-memory `Predicate`s and evaluates
+them over every entity. That is fine for a few dozen trails and wrong for
+notes: a field notebook grows without bound, and answering "kind is
+observation" would mean loading every note first.
+
+`NoteFilter` is data that storage compiles into bound SQL with a `LIMIT`. The
+Find action a person builds in Shortcuts becomes a query, and nothing above
+storage sees a row it did not ask for. This is what the type was created for
+in domain 0.5.0.
+
+### The extracted vocabulary
+
+```
+   title      → contains
+   body       → contains
+   kind       → equalTo, linked to NoteKindAppEnum
+   isPinned   → equalTo
+   updatedAt  → >= and <=
+   sortable   → title · updatedAt · observedAt
+```
+
+🧪 Read out of `extract.actionsdata`, so this is what the system received —
+not what the source says.
+
+### `@preconcurrency import AppIntents` is required
+
+`EntityQueryProperties` and `EntityQuerySortingOptions` are not `Sendable`, so
+declaring them as `static let` fails Swift 6's global-state check. Apple's own
+sample opens the same way, for the same reason.
+
+### The bitfield, extended again
+
+```
+   bit 0 (1)   EnumerableEntityQuery    notebooks
+   bit 1 (2)   EntityQuery base         both
+   bit 2 (4)   EntityStringQuery        notes
+   bit 3 (8)   EntityPropertyQuery      notes — new this wave
+   bit 6 (64)  common
+```
+
 ## M4 — text search
 
 Verified against domain 0.4.0, cold-storage 0.5.0, kit 0.5.0.
