@@ -9,8 +9,9 @@ import SparrowDomain
 /// handing the system every note, and a field notebook grows without bound —
 /// the picker would be unusable and the payload large. Notebooks are a small
 /// fixed set; notes are not.
-struct NoteEntityQuery: EntityQuery {
+struct NoteEntityQuery: EntityQuery, EntityStringQuery {
     @Dependency var notes: any NoteServicing
+    @Dependency var search: any SearchServicing
 
     /// Resolves identifiers the system already holds — from a saved shortcut,
     /// or a suggestion made weeks ago.
@@ -23,6 +24,16 @@ struct NoteEntityQuery: EntityQuery {
 
     /// FR-1.6: what the picker shows before anyone has typed anything.
     func suggestedEntities() async throws -> [NoteEntity] {
-        try await notes.recent(limit: 6).map(NoteEntity.init)
+        try await search.suggestions(limit: 6).map(NoteEntity.init)
+    }
+
+    /// What lets Siri resolve a note by name — "open my heron note" — instead
+    /// of showing a picker.
+    ///
+    /// It runs the same full-text search the app's own field does, so
+    /// FR-1.3's diacritic folding applies to a spoken query too: someone who
+    /// says "heron" finds a note titled "Herón".
+    func entities(matching string: String) async throws -> [NoteEntity] {
+        try await search.search(string, limit: 20).map(NoteEntity.init)
     }
 }

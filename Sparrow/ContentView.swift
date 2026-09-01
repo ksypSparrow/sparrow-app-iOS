@@ -94,12 +94,16 @@ struct ContentView: View {
                 }
             }
 
-            Section("Recent") {
-                if model.notes.isEmpty {
-                    Text("No notes yet.")
-                        .foregroundStyle(.secondary)
+            Section(model.isSearching ? "Results" : "Recent") {
+                if model.visibleNotes.isEmpty {
+                    Text(
+                        model.isSearching
+                            ? "Nothing matches \u{201C}\(model.query)\u{201D}."
+                            : "No notes yet."
+                    )
+                    .foregroundStyle(.secondary)
                 }
-                ForEach(model.notes) { note in
+                ForEach(model.visibleNotes) { note in
                     NoteRow(note: note)
                         .contentShape(.rect)
                         .onTapGesture { navigator.select(note: note.id) }
@@ -120,6 +124,14 @@ struct ContentView: View {
             }
         }
         .navigationTitle(selectedNotebookName)
+        .searchable(text: $model.query, prompt: "Search notes")
+        .task(id: model.query) {
+            // Runs on every keystroke, and is cancelled by the next one —
+            // `.task(id:)` tears the previous down before starting this. The
+            // debounce is what keeps a fast typist from issuing a query per
+            // character.
+            await model.runSearch()
+        }
         .alert(
             "Couldn't do that",
             isPresented: .constant(model.failure != nil),
@@ -149,9 +161,21 @@ struct ContentView: View {
 final class NoteListModel {
     private(set) var notes: [Note] = []
     private(set) var notebooks: [Notebook] = []
+    private(set) var results: [Note] = []
+    var query = ""
     var failure: ServiceError?
 
+    var isSearching: Bool {
+        !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// What the list shows: results while searching, recents otherwise.
+    var visibleNotes: [Note] { isSearching ? results : notes }
+
     private var noteService: (any NoteServicing)? { AppDependencies.noteService }
+    private var searchService: (any SearchServicing)? {
+        AppDependencies.searchService
+    }
     private var notebookService: (any NotebookServicing)? {
         AppDependencies.notebookService
     }
@@ -183,6 +207,33 @@ final class NoteListModel {
                     }
                 }
             }
+        }
+    }
+
+    /// Searches, after a short pause.
+    ///
+    /// Cancellation does the work here: `.task(id:)` tears this down when the
+    /// query changes, so the sleep is only survived by the last keystroke.
+    /// `FTSQuery` gives every term a `*`, so a note is findable before the
+    /// word is finished.
+    func runSearch() async {
+        guard let searchService, isSearching else {
+            results = []
+            return
+        }
+
+        do {
+            try await Task.sleep(for: .milliseconds(150))
+        } catch {
+            return   // superseded by the next keystroke
+        }
+
+        do {
+            results = try await searchService.search(query, limit: 100)
+        } catch let error as ServiceError {
+            failure = error
+        } catch {
+            failure = .storageUnavailable
         }
     }
 
