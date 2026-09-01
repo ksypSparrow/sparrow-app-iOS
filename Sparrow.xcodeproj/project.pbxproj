@@ -256,7 +256,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-domain";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.2.0;
+				minimumVersion = 0.3.0;
 			};
 		};
 		4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */ = {
@@ -264,7 +264,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-cold-storage";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.2.0;
+				minimumVersion = 0.3.0;
 			};
 		};
 		9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */ = {
@@ -272,7 +272,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.2.0;
+				minimumVersion = 0.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

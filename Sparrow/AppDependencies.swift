@@ -27,13 +27,32 @@ enum AppDependencies {
         // nothing above it changed. That was the point of returning protocols.
         let storage = try ColdStorage.make(at: storeURL)
 
+        // One relay for the whole app. Two would mean a view listening to the
+        // wrong one, silently.
+        let relay = ChangeRelay()
+
         let notes = NoteService(
             notes: storage.notes,
-            transactions: storage.transactions
+            transactions: storage.transactions,
+            relay: relay
         )
-        let notebooks = NotebookService(notebooks: storage.notebooks)
+        let notebooks = NotebookService(
+            notebooks: storage.notebooks,
+            transactions: storage.transactions,
+            relay: relay
+        )
         noteService = notes
         notebookService = notebooks
+
+        // Every write that goes through *this process's* storage reaches the
+        // UI through here, whoever made it — a view, an intent, or a widget
+        // hosted in-process.
+        //
+        // ⚠️ Not cross-process. The broadcaster lives in this instance of
+        // ColdStorage, so a separate extension writing the same file would go
+        // unnoticed. That needs `DatabaseRegionObservation` or a Darwin
+        // notification, and it is not in V1.
+        Task { await relay.start(consuming: storage.observer.changes) }
 
         // Registered as protocols, not as the actors. An intent that could
         // name `NoteService` could reach past the contract it is meant to use.
