@@ -16,6 +16,46 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M3 — notes, entities and intents
+
+Verified against domain 0.4.0, cold-storage 0.4.0, kit 0.4.0.
+
+```
+   ✓  the picker offers the six most recently edited notes    FR-1.6
+   ✓  no entity carries image data — names only               NFR-1.4
+   ✓  a saved shortcut resolves after delete + reinstall      NFR-1.3
+   ✓  CreateNote returns a NoteEntity, so it can chain into OpenNote
+   ✓  the metadata gate prints both processors
+   ~  parameter summaries read as sentences for EVERY kind
+```
+
+### The two queries differ on purpose, and the metadata proves it
+
+```
+   NotebookEntityQuery  capabilities 67  → enumerable bit 1
+   NoteEntityQuery      capabilities 66  → enumerable bit 0
+```
+
+Notebooks enumerate: a small, fixed set, so Shortcuts shows a picker with no
+typing. **Notes deliberately do not.** Enumerating means handing the system
+every note, and a field notebook grows without bound — the picker would be
+unusable and the payload large. Notes get `suggestedEntities()` returning the
+six most recent instead, which is FR-1.6.
+
+### NFR-1.3 is a property of the identifier
+
+`NoteEntity.id` is `NoteID.value` — a **client-generated UUID**, stored in
+SQLite. Not a row id, not an index. A shortcut saved months ago resolves after
+a delete and reinstall because the identifier came from the note rather than
+from the database's bookkeeping.
+
+### NFR-1.4, checked in the extracted metadata
+
+No `image`, `imageData`, `displayImage` or `data` key appears anywhere under
+`entities` in `extract.actionsdata`. Entities are serialised into saved
+shortcuts, Siri suggestions and the on-device index; pixels in one would bloat
+all three and copy content somewhere it cannot be revoked.
+
 ## M2 — notebook CRUD
 
 Verified against domain 0.3.0, cold-storage 0.3.0, kit 0.3.0.

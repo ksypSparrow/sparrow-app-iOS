@@ -27,23 +27,49 @@ struct CreateNoteIntent: AppIntent {
     @Parameter(title: "Note")
     var content: String?
 
+    @Parameter(title: "Kind", default: .observation)
+    var kind: NoteKindAppEnum
+
+    @Parameter(title: "Notebook")
+    var notebook: NotebookEntity?
+
+    /// When the observation happened, which may precede now by hours — a note
+    /// written up in the evening about a bird seen at dawn.
+    @Parameter(title: "Observed")
+    var observedAt: Date?
+
     /// Resolved from `AppDependencyManager`, which `SparrowApp.init()` fills in.
     /// If that registration ever moves into a view's `.task`, this line is
     /// where a background launch crashes.
     @Dependency var notes: any NoteServicing
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Create a note titled \(\.$noteTitle)") {
+        Summary("Create a \(\.$kind) called \(\.$noteTitle)") {
             \.$content
+            \.$notebook
+            \.$observedAt
         }
     }
 
-    func perform() async throws -> some IntentResult & ProvidesDialog {
+    func perform() async throws -> some IntentResult & ReturnsValue<NoteEntity>
+        & ProvidesDialog
+    {
         let note = try await translatingServiceErrors {
             try await notes.create(
-                NoteDraft(title: noteTitle, body: content ?? "")
+                NoteDraft(
+                    title: RichText(plain: noteTitle),
+                    body: RichText(plain: content ?? ""),
+                    notebookID: notebook?.notebookID,
+                    kind: kind.domainKind,
+                    observedAt: observedAt
+                )
             )
         }
-        return .result(dialog: "Saved \(note.title).")
+        // Returning the entity is what lets a shortcut chain this into
+        // OpenNote or UpdateNote without looking the note up again.
+        return .result(
+            value: NoteEntity(note),
+            dialog: "Saved \(note.plainTitle)."
+        )
     }
 }

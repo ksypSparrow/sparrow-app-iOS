@@ -15,5 +15,14 @@ struct SparrowShortcuts: AppShortcutsProvider {
             shortTitle: "New Note",
             systemImageName: "square.and.pencil"
         )
+        AppShortcut(
+            intent: OpenNoteIntent(),
+            phrases: [
+                "Open a note in \(.applicationName)",
+                "Show me a note in \(.applicationName)",
+            ],
+            shortTitle: "Open Note",
+            systemImageName: "doc.text"
+        )
     }
 }
