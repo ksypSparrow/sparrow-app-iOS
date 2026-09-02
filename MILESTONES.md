@@ -16,6 +16,48 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M7 — today's entry
+
+Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0.
+
+```
+   ✓  OpenTodaysEntryIntent extracts, opens the app, returns a NoteEntity
+   ✓  the Siri phrase compiles:
+      Open today's entry in ${+applicationName}
+   ✓  the daily-uniqueness index is on the device
+   ~  Siri: "Open today's entry in Sparrow"                    FR-1.7
+   ~  running it twice opens the same note
+```
+
+### Custom, not schema-based — and that is the requirement
+
+Apple's journaling schemas surface in **Shortcuts only**; they never reach
+Siri. FR-1.7 asks for a working *voice* phrase, so the intent has to be one of
+ours. This is the first place a schema was rejected on purpose rather than
+adopted, and the reason is in `architecture.md` §2.4.
+
+### Idempotence is what makes the double call safe
+
+The intent opens the entry, then `ContentView`'s `.onAppIntentExecution` asks
+again — because the intent knows *that* a note was opened and the view needs to
+know *which*.
+
+That is only safe because `openOrCreateDailyNote` is idempotent. A
+create-then-open pair here would produce two entries for one voice command, and
+the second would win the display while the first sat orphaned.
+
+### One compiler limit worth recording
+
+The `NavigationSplitView` body stopped type-checking in reasonable time once
+the alerts and the intent modifier were on it:
+
+> error: the compiler is unable to type-check this expression in reasonable
+> time
+
+Extracting the sidebar into its own computed property fixed it. Worth knowing
+that SwiftUI view bodies have a practical ceiling, and that the cure is the one
+the compiler names.
+
 ## M6 — tags
 
 Verified against domain 0.6.0, cold-storage 0.7.0, kit 0.7.0.

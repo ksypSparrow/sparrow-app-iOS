@@ -264,7 +264,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-cold-storage";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.7.0;
+				minimumVersion = 0.8.0;
 			};
 		};
 		9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */ = {
@@ -272,7 +272,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 0.7.0;
+				minimumVersion = 0.8.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
