@@ -16,6 +16,63 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M9 — Apple schemas
+
+Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0 — **no package
+changes**, the second app-only wave.
+
+```
+   ✓  it compiles, and — more to the point — it extracts
+   ✓  NoteEntity, NotebookEntity, AccountEntity, CreateNoteIntent,
+      UpdateNoteIntent all carry domain: notes conformances
+   ✓  attachments is present and empty; nothing breaks
+   ⏸️ .journal.createEntry deferred — see below
+   ~  Siri handles phrasings you never wrote a shortcut for
+   ~  the journal action appears in Shortcuts but NOT in Siri
+```
+
+### Schema conformance is enforced at *extraction*, not compilation
+
+Every requirement below came from `appintentsmetadataprocessor` **after a clean
+compile**. A probe that only type-checks proves nothing about a schema.
+
+| What the extractor demanded | |
+|---|---|
+| `.notes.folder` needs `account` | Sparrow has no accounts |
+| `.notes.account` needs `name` | |
+| `name` must index to `\.displayName` | not `\.title` |
+| `.notes.createNote` wants `name: String` | while `.notes.note` wants `AttributedString` |
+| `attachments` needs `supportedTypeIdentifiers` | |
+| `attachments` optional on `updateNote`, not on `createNote` | |
+| `folder`'s entity needs an `EntityStringQuery` | |
+
+### The open question, answered
+
+🧪 **Yes — a schema intent can add `& ProvidesDialog`.** Both note intents
+return `some IntentResult & ReturnsValue<NoteEntity> & ProvidesDialog` and the
+extractor accepts it, so FR-1.1 keeps its spoken confirmation.
+
+### What adopting the schema cost
+
+⚠️ **Filter-by-kind is gone from the Find action.** Extras on a
+schema-conforming entity must be optional, so `kind` became
+`NoteKindAppEnum?` — and `EntityPropertyQuery` rejects an optional enum with a
+misleading *"no extractable localized title"*. M5 shipped that capability;
+M9 removed it.
+
+`kind`, `observedAt` and `tags` also left the intent signatures: a schema
+intent cannot add parameters the schema does not have.
+
+### `.journal.createEntry`, deferred
+
+The extractor demands `entryDate`, `location`, `mediaItems`, `message` **and** a
+`JournalEntity` return type — which needs its own `.journal.entry` conformance,
+bringing location and media concepts Sparrow does not have.
+
+The schema also never reaches Siri. So the whole cascade buys a Shortcuts-only
+action that `OpenTodaysEntryIntent` (M7, custom, voice-capable) already covers.
+Recorded in the plan rather than half-modelled.
+
 ## M8 — Spotlight
 
 Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0 — **no package
