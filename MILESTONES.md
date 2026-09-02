@@ -16,6 +16,60 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M10 — navigation and UI
+
+Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0 — **no package
+changes**, the third and last app-only wave.
+
+```
+   ✓  no intent's perform() touches Navigator on iOS
+   ✓  the app builds for macOS as well as iOS — first time
+   ✓  handlesExternalEvents scene targeting
+   ✓  SiriTipView and ShortcutsLink, dismissal persisted     FR-1.10
+   ~  every open-style intent lands on the right screen, iOS AND macOS
+   ~  two windows open: an intent does not navigate the edited one
+```
+
+### `Route`, not two optionals
+
+"A note is open" and "a notebook is selected" are alternatives. Two optionals
+can be both at once — a state the UI has no way to draw — so `Navigator` holds
+one `Route`.
+
+### Navigation left the intents
+
+`OpenNoteIntent`, `OpenNotebookIntent` and `OpenTodaysEntryIntent` no longer
+touch `Navigator` on iOS. `.onAppIntentExecution` fires on the **scene that ran
+the intent**, which is what stops two open windows fighting over which one
+moves: the one asked navigates, and the one being edited in stays put.
+
+### 🧪 Four APIs are unavailable on macOS
+
+The plan anticipated a `#if os(macOS)` branch. The reality is stronger — these
+are not merely absent, they cannot be *named*:
+
+```
+   TargetContentProvidingIntent   'unavailable in macOS'
+   .onAppIntentExecution          no such member
+   SiriTipView                    'unavailable in macOS'
+   ShortcutsLink                  no such member
+```
+
+`TargetContentProvidingIntent` is the sharp one: the **conformance** has to be
+gated, not just the call site, so it moved to
+`#if os(iOS) extension … {}`. A `#if` around the method would still have failed
+to compile.
+
+This is also the first time the app has been built for macOS at all. The
+project has claimed `macosx` in `SUPPORTED_PLATFORMS` since M0, and nothing had
+tested it.
+
+### FR-1.10 needs no mechanism
+
+`SiriTipView` writes through its `isVisible` binding when someone dismisses it.
+Binding that to `@AppStorage` rather than `@State` is the entire
+implementation — there is nothing to remember to persist.
+
 ## M9 — Apple schemas
 
 Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0 — **no package

@@ -15,15 +15,24 @@ struct OpenNoteIntent: OpenIntent {
     @Parameter(title: "Note")
     var target: NoteEntity
 
-    @Dependency var navigator: Navigator
-
     static var parameterSummary: some ParameterSummary {
         Summary("Open \(\.$target)")
     }
 
+    /// ⚠️ **`perform()` does not navigate on iOS.**
+    ///
+    /// `.onAppIntentExecution` in `ContentView` maps this intent to a
+    /// destination, which is what keeps navigation a property of the *scene*
+    /// that ran it. An intent that set `Navigator` directly would move
+    /// whichever window happened to be frontmost — including one somebody was
+    /// editing in.
+    ///
+    /// macOS has no such modifier, so there the intent does it itself.
     @MainActor
     func perform() async throws -> some IntentResult {
-        navigator.select(note: target.noteID)
+        #if os(macOS)
+        Navigator.shared.go(to: .note(target.noteID))
+        #endif
         return .result()
     }
 }
@@ -116,3 +125,11 @@ struct DeleteNoteIntent: AppIntent {
         return .result(dialog: "Deleted \(note.name).")
     }
 }
+
+#if os(iOS)
+/// ⚠️ **`TargetContentProvidingIntent` is unavailable on macOS**, and so is
+/// `.onAppIntentExecution`. The conformance has to be gated, not just the call
+/// site — which is the platform difference the design anticipated, arriving in
+/// a stronger form than expected.
+extension OpenNoteIntent: TargetContentProvidingIntent {}
+#endif

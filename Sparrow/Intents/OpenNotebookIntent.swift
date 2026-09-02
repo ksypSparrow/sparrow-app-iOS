@@ -17,11 +17,20 @@ struct OpenNotebookIntent: OpenIntent {
     @Parameter(title: "Notebook")
     var target: NotebookEntity
 
-    @Dependency var navigator: Navigator
-
+    /// ⚠️ **Does not navigate on iOS.** `.onAppIntentExecution` in
+    /// `ContentView` maps this to a destination, which keeps navigation a
+    /// property of the scene that ran the intent rather than of whichever
+    /// window is frontmost. macOS has no such modifier, so there the intent
+    /// does it itself.
     @MainActor
     func perform() async throws -> some IntentResult {
-        navigator.select(target.notebookID)
+        #if os(macOS)
+        Navigator.shared.go(to: .notebook(target.notebookID))
+        #endif
         return .result()
     }
 }
+
+#if os(iOS)
+extension OpenNotebookIntent: TargetContentProvidingIntent {}
+#endif

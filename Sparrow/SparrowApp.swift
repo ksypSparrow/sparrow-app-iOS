@@ -21,5 +21,16 @@ struct SparrowApp: App {
         WindowGroup {
             ContentView()
         }
+        // ⚠️ Scene targeting, so an intent's navigation reaches a window that
+        // is already open rather than spawning another.
+        //
+        // Without it, "open my heron note" on a Mac with Sparrow already
+        // running opens a second window showing the note, and leaves the first
+        // one where it was — two windows, one of them stale.
+        .handlesExternalEvents(matching: [SparrowApp.noteActivity])
     }
+
+    /// The activity name a scene answers to. One value, used by the scene and
+    /// by anything that wants to route to it.
+    static let noteActivity = "com.sparrow.fieldnotes.note"
 }

@@ -1,3 +1,4 @@
+import AppIntents
 import ServiceContracts
 import SparrowDomain
 import SwiftUI
@@ -7,6 +8,8 @@ struct ContentView: View {
     @State private var navigator = Navigator.shared
     @State private var draftTitle = ""
     @State private var notebookName = ""
+    /// FR-1.10. `@AppStorage`, so dismissal survives a launch.
+    @AppStorage("showSiriTip") private var showSiriTip = true
     @State private var creating = false
     @State private var renaming: Notebook?
 
@@ -29,9 +32,8 @@ struct ContentView: View {
         // ⚠️ Safe only because `openOrCreateDailyNote` is idempotent — the
         // second call returns the note the first one made. A create-then-open
         // pair here would produce two entries for one voice command.
-        .onAppIntentExecution(OpenTodaysEntryIntent.self) { _ in
-            Task { await model.openTodaysEntry() }
-        }
+        .intentNavigation(model: model, navigator: navigator)
+
     }
 
     /// Extracted because the whole `NavigationSplitView` body stopped
@@ -87,6 +89,34 @@ struct ContentView: View {
         }
     }
 
+    /// The Siri tip and the Shortcuts link.
+    ///
+    /// FR-1.10: the tip must stay dismissed across launches, so its visibility
+    /// is `@AppStorage` rather than `@State`. `SiriTipView` writes `false`
+    /// through the binding when someone taps its close button, and that is the
+    /// whole mechanism — there is nothing to remember to persist.
+    ///
+    /// ⚠️ **Both are iOS-only.** `SiriTipView` and `ShortcutsLink` are
+    /// unavailable on macOS — where the Shortcuts app is reached from its own
+    /// menu, so there is nothing for the app to offer.
+    @ViewBuilder
+    private var sidebarFooter: some View {
+        #if os(iOS)
+        VStack(spacing: 8) {
+            if showSiriTip {
+                SiriTipView(
+                    intent: OpenTodaysEntryIntent(),
+                    isVisible: $showSiriTip
+                )
+            }
+            ShortcutsLink()
+                .shortcutsLinkStyle(.automaticOutline)
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 8)
+        #endif
+    }
+
     private var renamingBinding: Binding<Bool> {
         Binding(
             get: { renaming != nil },
@@ -97,7 +127,7 @@ struct ContentView: View {
     private var notebookSelection: Binding<NotebookID?> {
         Binding(
             get: { navigator.selectedNotebookID },
-            set: { navigator.select($0) }
+            set: { navigator.go(to: $0.map(Route.notebook) ?? .recents) }
         )
     }
 
@@ -124,7 +154,7 @@ struct ContentView: View {
                 ForEach(model.visibleNotes) { note in
                     NoteRow(note: note)
                         .contentShape(.rect)
-                        .onTapGesture { navigator.select(note: note.id) }
+                        .onTapGesture { navigator.go(to: .note(note.id)) }
                         .swipeActions {
                             Button("Delete", role: .destructive) {
                                 Task { await model.delete(note: note.id) }
@@ -290,7 +320,7 @@ final class NoteListModel {
         guard let noteService else { return }
         await reportingFailure {
             let note = try await noteService.openOrCreateDailyNote(on: Date())
-            Navigator.shared.select(note: note.id)
+            Navigator.shared.go(to: .note(note.id))
             await self.reload()
         }
     }
@@ -315,7 +345,7 @@ final class NoteListModel {
         guard let noteService else { return }
         await reportingFailure { try await noteService.delete(id) }
         if Navigator.shared.selectedNoteID == id {
-            Navigator.shared.select(note: nil)
+            Navigator.shared.go(to: .recents)
         }
     }
 
@@ -378,18 +408,50 @@ final class NoteListModel {
         // on another device once V2 exists.
         if let selected = Navigator.shared.selectedNotebookID,
            !notebooks.contains(where: { $0.id == selected }) {
-            Navigator.shared.select(nil)
+            Navigator.shared.go(to: .recents)
         }
-        if Navigator.shared.selectedNotebookID == nil {
-            Navigator.shared.select(
-                try? await notebookService.defaultNotebook().id
-            )
+        if Navigator.shared.selectedNotebookID == nil,
+           let fallback = try? await notebookService.defaultNotebook().id {
+            Navigator.shared.go(to: .notebook(fallback))
         }
     }
 
     func reload() async {
         guard let noteService else { return }
         notes = (try? await noteService.recent(limit: 50)) ?? []
+    }
+}
+
+private extension View {
+    /// Maps every open-style intent to a destination.
+    ///
+    /// ⚠️ **iOS only.** `.onAppIntentExecution` does not exist on macOS, and
+    /// neither does `TargetContentProvidingIntent` — so there the intents set
+    /// `Navigator` themselves. Gathering the modifiers here keeps that one
+    /// `#if` in one place instead of three.
+    ///
+    /// The modifier fires on the scene that ran the intent, which is what stops
+    /// two open windows fighting over which one moves: the one asked navigates,
+    /// and the one being edited in stays put.
+    @ViewBuilder
+    func intentNavigation(
+        model: NoteListModel,
+        navigator: Navigator
+    ) -> some View {
+        #if os(iOS)
+        self
+            .onAppIntentExecution(OpenTodaysEntryIntent.self) { _ in
+                Task { await model.openTodaysEntry() }
+            }
+            .onAppIntentExecution(OpenNoteIntent.self) { intent in
+                navigator.go(to: .note(intent.target.noteID))
+            }
+            .onAppIntentExecution(OpenNotebookIntent.self) { intent in
+                navigator.go(to: .notebook(intent.target.notebookID))
+            }
+        #else
+        self
+        #endif
     }
 }
 
