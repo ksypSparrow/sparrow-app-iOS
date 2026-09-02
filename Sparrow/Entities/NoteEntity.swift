@@ -1,4 +1,5 @@
 import AppIntents
+import CoreSpotlight
 import Foundation
 import SparrowDomain
 
@@ -8,7 +9,7 @@ import SparrowDomain
 /// a date. An entity is serialised into saved shortcuts, Siri suggestions and
 /// the on-device index; putting a sketch's pixels in one would bloat all three
 /// and copy the note's content somewhere it cannot be revoked.
-struct NoteEntity: AppEntity {
+struct NoteEntity: AppEntity, IndexedEntity {
     static let typeDisplayRepresentation = TypeDisplayRepresentation(
         name: "Note",
         numericFormat: "\(placeholder: .int) notes"
@@ -23,19 +24,53 @@ struct NoteEntity: AppEntity {
     /// the note rather than from a database row number.
     let id: UUID
 
-    @Property(title: "Title") var title: String
-    @Property(title: "Note") var body: String
-    @Property(title: "Kind") var kind: NoteKindAppEnum
-    @Property(title: "Pinned") var isPinned: Bool
+    /// ⚠️ **Computed, not stored, and that is what `indexingKey:` requires.**
+    /// `@Property` has no `indexingKey` variant — only `@ComputedProperty` and
+    /// `@DeferredProperty` do, and both refuse a stored property. So the
+    /// entity wraps the note and derives its properties from it.
+    ///
+    /// `indexingKey:` maps each onto the attribute Spotlight already
+    /// understands, so searching for a note's title matches the way searching
+    /// for a document's title does — rather than only through keywords.
+    @ComputedProperty(indexingKey: \.title) var title: String {
+        note.plainTitle
+    }
+
+    @ComputedProperty(indexingKey: \.textContent) var body: String {
+        note.plainBody
+    }
+
+    /// A `customIndexingKey` because there is no standard Spotlight attribute
+    /// for "what kind of note this is". The string is what someone would type:
+    /// "sketch", "voice".
+    @ComputedProperty(
+        title: "Kind",
+        indexingKey: \.keywords
+    ) var kind: NoteKindAppEnum {
+        NoteKindAppEnum(note.kind)
+    }
+
+    @ComputedProperty(title: "Pinned") var isPinned: Bool { note.isPinned }
 
     /// ⚠️ **Optional, and it has to be.** Extra properties on an entity that
     /// conforms to an Apple schema must be optional, and `NoteEntity` adopts
     /// `.notes.note` at M9. Making it non-optional now would compile fine and
     /// fail three milestones later, after every intent had been written
     /// against it.
-    @Property(title: "Tags") var tags: [TagEntity]?
-    @Property(title: "Observed") var observedAt: Date?
-    @Property(title: "Last Edited") var updatedAt: Date
+    @ComputedProperty(title: "Tags") var tags: [TagEntity]? {
+        note.tagIDs.isEmpty
+            ? nil
+            : note.tagIDs.map { TagEntity(Tag(id: $0, label: $0.slug)) }
+    }
+    @ComputedProperty(
+        title: "Observed",
+        indexingKey: \.contentCreationDate
+    ) var observedAt: Date? { note.observedAt }
+
+    @ComputedProperty(
+        title: "Last Edited",
+        indexingKey: \.contentModificationDate
+    ) var updatedAt: Date { note.updatedAt }
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
@@ -45,24 +80,43 @@ struct NoteEntity: AppEntity {
         )
     }
 
+    /// The note this entity describes.
+    ///
+    /// Private, and every exposed property is a **plain** projection of it.
+    /// Attributes would not survive serialisation into a saved shortcut, and a
+    /// person reading a suggestion wants the words. NFR-1.4 still holds: what
+    /// crosses to the system is text and dates.
+    private let note: Note
+
     init(_ note: Note) {
-        id = note.id.value
-        // The plain projection, deliberately. Attributes would not survive
-        // serialisation into a saved shortcut, and a person reading a
-        // suggestion wants the words.
-        title = note.plainTitle
-        body = note.plainBody
-        kind = NoteKindAppEnum(note.kind)
-        isPinned = note.isPinned
-        // Names only, as everywhere else — a tag entity carries its label and
-        // its slug, both of which are text.
-        tags = note.tagIDs.map { TagEntity(Tag(id: $0, label: $0.slug)) }
-        observedAt = note.observedAt
-        updatedAt = note.updatedAt
+        self.id = note.id.value
+        self.note = note
     }
 
     /// The identifier the service layer speaks.
     var noteID: NoteID { NoteID(id) }
+}
+
+// MARK: - Spotlight
+
+extension NoteEntity {
+    /// Extra attributes Spotlight can match on, beyond the display
+    /// representation it derives automatically.
+    ///
+    /// ⚠️ **Text only.** An attribute set is copied into the on-device index,
+    /// which is another place a note's content would live — so this carries
+    /// what makes a note *findable* and nothing more, the same rule NFR-1.4
+    /// applies to entities.
+    var attributeSet: CSSearchableItemAttributeSet {
+        let attributes = CSSearchableItemAttributeSet(contentType: .text)
+        attributes.title = title.isEmpty ? "Untitled note" : title
+        attributes.contentDescription = body
+        // What a person would type: "sketch", "voice note".
+        attributes.keywords = [kind.rawValue] + (tags?.map(\.label) ?? [])
+        attributes.contentModificationDate = updatedAt
+        attributes.contentCreationDate = observedAt
+        return attributes
+    }
 }
 
 /// `NoteKind`, as the system sees it.
