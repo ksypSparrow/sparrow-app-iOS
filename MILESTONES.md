@@ -16,6 +16,63 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M8 — Spotlight
+
+Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0 — **no package
+changes**, the first fully app-only wave.
+
+```
+   ✓  NoteEntity: IndexedEntity; NoteEntityQuery: IndexedEntityQuery
+   ✓  capabilities 78 → 334 — bit 8 is IndexedEntityQuery
+   ✓  a named CSSearchableIndex, not .default()
+   ✓  the indexer subscribes to NoteServicing.changes — a contract from 0.1.0
+   ⏳ every gate item below needs a physical device
+```
+
+### The gate needs hardware, not just the UI fix
+
+⚠️ **Apple states Simulator indexing does not always match a device**, and the
+plan flags M8 as the first milestone requiring one. So FR-1.8's "findable
+within 60 s", "disappears within 60 s", FR-1.2's "tapping a result opens the
+note", and the suggestion checks are **not** verifiable here — separately from
+the `xcode-select` issue blocking the other milestones.
+
+What is verified is everything reachable from the build: the conformances
+extract, the query advertises indexing, and the app runs with the indexer
+subscribed.
+
+### Why Spotlight needed no package release
+
+`SpotlightIndexer` consumes `NoteServicing.changes`, published in **kit 0.1.0**
+and unchanged since. Spotlight is a *consumer* of an existing contract, not a
+new capability — which is exactly what the plan predicted for waves 8–10.
+
+### Two API facts worth keeping
+
+**`indexingKey:` exists only on `@ComputedProperty` and `@DeferredProperty`**,
+and both refuse a stored property. `@Property` has no such variant. So an
+entity that wants its fields mapped onto Spotlight attributes has to *wrap* its
+model and compute them — which is why `NoteEntity` now holds a private `Note`.
+
+**`CSSearchableIndex` is not `Sendable`.** Holding one in an actor and using it
+across an `await` is refused:
+
+> error: sending 'index' risks causing data races
+
+The indexer stores the index **name** and builds a handle inside `nonisolated`
+helpers. A handle is per-call; the index is the file on disk.
+
+### The bitfield, five conformances deep
+
+```
+   bit 0 (1)    EnumerableEntityQuery    notebooks · tags
+   bit 1 (2)    EntityQuery base         all
+   bit 2 (4)    EntityStringQuery        notes
+   bit 3 (8)    EntityPropertyQuery      notes
+   bit 6 (64)   common                   all
+   bit 8 (256)  IndexedEntityQuery       notes — new this wave
+```
+
 ## M7 — today's entry
 
 Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0.

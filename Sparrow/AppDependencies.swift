@@ -15,6 +15,8 @@ enum AppDependencies {
     private(set) nonisolated(unsafe) static var notebookService: (any NotebookServicing)?
     private(set) nonisolated(unsafe) static var searchService: (any SearchServicing)?
     private(set) nonisolated(unsafe) static var tagService: (any TagServicing)?
+    /// Held so the subscription outlives `register()`.
+    private(set) nonisolated(unsafe) static var spotlightIndexer: SpotlightIndexer?
 
     /// Where the database lives. Application Support, not Documents — this is
     /// app-managed state, not something a person files or opens themselves.
@@ -57,6 +59,13 @@ enum AppDependencies {
         notebookService = notebooks
         searchService = search
         tagService = tags
+
+        // Spotlight follows the same change stream the UI does. It is a
+        // consumer of `NoteServicing.changes`, published since kit 0.1.0 —
+        // which is why Spotlight needed no package release.
+        let indexer = SpotlightIndexer(notes: notes)
+        spotlightIndexer = indexer
+        Task { await indexer.start() }
 
         // Every write that goes through *this process's* storage reaches the
         // UI through here, whoever made it — a view, an intent, or a widget
