@@ -14,7 +14,7 @@ import SparrowDomain
 /// `TargetContentProvidingIntent` is what lets the app show the note it
 /// opened: the intent does the work, and `ContentView` maps the execution to a
 /// destination.
-struct OpenTodaysEntryIntent: AppIntent, TargetContentProvidingIntent {
+struct OpenTodaysEntryIntent: AppIntent {
     static let title: LocalizedStringResource = "Open Today's Entry"
 
     static let description = IntentDescription(
@@ -41,3 +41,7 @@ struct OpenTodaysEntryIntent: AppIntent, TargetContentProvidingIntent {
         )
     }
 }
+
+#if os(iOS)
+extension OpenTodaysEntryIntent: TargetContentProvidingIntent {}
+#endif

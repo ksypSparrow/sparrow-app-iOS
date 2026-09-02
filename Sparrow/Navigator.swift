@@ -5,8 +5,10 @@ import SparrowDomain
 /// Where the app is looking.
 ///
 /// Navigation is presentation state, so it lives here rather than in
-/// `SparrowKit` — a service has no opinion about which notebook is on screen.
-/// An intent sets it; the views read it.
+/// `SparrowKit` — a service has no opinion about which note is on screen.
+/// `NavigationServicing` was removed from `ServiceContracts` during contract
+/// design for exactly this reason: routing it through a protocol would have
+/// satisfied a dependency that does not exist.
 @MainActor
 @Observable
 final class Navigator {
@@ -15,16 +17,32 @@ final class Navigator {
     /// set navigation state nobody is watching.
     static let shared = Navigator()
 
-    var selectedNotebookID: NotebookID?
-    var selectedNoteID: NoteID?
+    var route: Route = .recents
 
     private init() {}
 
-    func select(_ id: NotebookID?) {
-        selectedNotebookID = id
+    func go(to route: Route) {
+        self.route = route
     }
 
-    func select(note id: NoteID?) {
-        selectedNoteID = id
+    // MARK: Conveniences the views read
+
+    var selectedNotebookID: NotebookID? {
+        if case .notebook(let id) = route { id } else { nil }
     }
+
+    var selectedNoteID: NoteID? {
+        if case .note(let id) = route { id } else { nil }
+    }
+}
+
+/// Every screen an intent can land on.
+///
+/// An enum rather than a pair of optionals: "a note is open" and "a notebook is
+/// selected" are alternatives, and two optionals can be both at once — a state
+/// the UI has no way to draw.
+enum Route: Hashable, Sendable {
+    case recents
+    case notebook(NotebookID)
+    case note(NoteID)
 }
