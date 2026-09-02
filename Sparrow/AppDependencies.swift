@@ -14,6 +14,7 @@ enum AppDependencies {
     private(set) nonisolated(unsafe) static var noteService: (any NoteServicing)?
     private(set) nonisolated(unsafe) static var notebookService: (any NotebookServicing)?
     private(set) nonisolated(unsafe) static var searchService: (any SearchServicing)?
+    private(set) nonisolated(unsafe) static var tagService: (any TagServicing)?
 
     /// Where the database lives. Application Support, not Documents — this is
     /// app-managed state, not something a person files or opens themselves.
@@ -46,10 +47,16 @@ enum AppDependencies {
         // Holds a reader and an index, and nothing that can write — so
         // searching cannot change anything, structurally.
         let search = SearchService(notes: storage.notes, index: storage.search)
+        let tags = TagService(
+            tags: storage.tags,
+            transactions: storage.transactions,
+            relay: relay
+        )
 
         noteService = notes
         notebookService = notebooks
         searchService = search
+        tagService = tags
 
         // Every write that goes through *this process's* storage reaches the
         // UI through here, whoever made it — a view, an intent, or a widget
@@ -67,6 +74,7 @@ enum AppDependencies {
         AppDependencyManager.shared
             .add(dependency: notebooks as any NotebookServicing)
         AppDependencyManager.shared.add(dependency: search as any SearchServicing)
+        AppDependencyManager.shared.add(dependency: tags as any TagServicing)
         // ⚠️ Not `add(dependency: Navigator.shared)`. That overload takes a
         // `@Sendable` autoclosure, and `Navigator` is `@MainActor`, so the
         // reference cannot be made from inside one. The async provider

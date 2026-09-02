@@ -58,6 +58,11 @@ struct UpdateNoteIntent: AppIntent {
     @Parameter(title: "Pinned")
     var isPinned: Bool?
 
+    /// Replaces the note's tags. Leaving it out leaves them alone — the same
+    /// three-way distinction `NoteEdit` makes, surfaced to Shortcuts.
+    @Parameter(title: "Tags")
+    var tags: [TagEntity]?
+
     @Dependency var notes: any NoteServicing
 
     static var parameterSummary: some ParameterSummary {
@@ -66,6 +71,7 @@ struct UpdateNoteIntent: AppIntent {
             \.$newBody
             \.$kind
             \.$isPinned
+            \.$tags
         }
     }
 
@@ -75,6 +81,7 @@ struct UpdateNoteIntent: AppIntent {
         let edit = NoteEdit(
             title: newTitle.map { RichText(plain: $0) },
             body: newBody.map { RichText(plain: $0) },
+            tagIDs: tags.map { $0.compactMap(\.tagID) },
             kind: kind?.domainKind,
             isPinned: isPinned
         )

@@ -27,6 +27,13 @@ struct NoteEntity: AppEntity {
     @Property(title: "Note") var body: String
     @Property(title: "Kind") var kind: NoteKindAppEnum
     @Property(title: "Pinned") var isPinned: Bool
+
+    /// ⚠️ **Optional, and it has to be.** Extra properties on an entity that
+    /// conforms to an Apple schema must be optional, and `NoteEntity` adopts
+    /// `.notes.note` at M9. Making it non-optional now would compile fine and
+    /// fail three milestones later, after every intent had been written
+    /// against it.
+    @Property(title: "Tags") var tags: [TagEntity]?
     @Property(title: "Observed") var observedAt: Date?
     @Property(title: "Last Edited") var updatedAt: Date
 
@@ -47,6 +54,9 @@ struct NoteEntity: AppEntity {
         body = note.plainBody
         kind = NoteKindAppEnum(note.kind)
         isPinned = note.isPinned
+        // Names only, as everywhere else — a tag entity carries its label and
+        // its slug, both of which are text.
+        tags = note.tagIDs.map { TagEntity(Tag(id: $0, label: $0.slug)) }
         observedAt = note.observedAt
         updatedAt = note.updatedAt
     }

@@ -27,6 +27,10 @@ enum SparrowIntentError: Error, CustomLocalizedStringResourceConvertible {
             "A notebook needs a name."
         case .service(.notebookNotEmpty):
             "That notebook still has things in it. Move or delete them first."
+        case .service(.emptyTagLabel):
+            "A tag needs a word or a number in it — try \u{201C}wetlands\u{201D}."
+        case .service(.tagNotFound):
+            "That tag no longer exists."
         case .service(.storageUnavailable):
             "Sparrow can't reach your notes right now."
         }

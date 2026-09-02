@@ -16,6 +16,45 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M6 — tags
+
+Verified against domain 0.6.0, cold-storage 0.7.0, kit 0.7.0.
+
+```
+   ✓  TagEntity and TagEntityQuery reach the metadata
+   ✓  TagEntityQuery is enumerable — capabilities 67, like notebooks
+   ✓  NoteEntity.tags records as optional=True
+   ✓  on-device schema reaches v4_tags with tag and note_tag
+   ✓  tags are editable from Shortcuts, through UpdateNoteIntent
+```
+
+### `tags` is optional, and it had to be
+
+Extra properties on an entity conforming to an Apple schema must be optional,
+and `NoteEntity` adopts `.notes.note` at M9. Declaring it non-optional would
+compile fine now and fail three milestones later — after every intent had been
+written against it.
+
+🧪 Confirmed in `extract.actionsdata`, where `tags` reads `optional=True` while
+`title`, `body`, `kind` and `isPinned` read `optional=False`.
+
+### The first entity whose identity is not a UUID
+
+`TagEntity.ID` is a `String` — the slug. That is `TagID` showing through: a
+tag's identity *is* its text, so two devices that have never met agree on it
+without coordination, and a saved shortcut referring to `"wetlands"` resolves
+on a fresh install.
+
+### The bitfield, three queries deep
+
+```
+   NotebookEntityQuery   67   enumerable
+   TagEntityQuery        67   enumerable — new this wave
+   NoteEntityQuery       78   string + property queries, not enumerable
+```
+
+Small browsable sets enumerate; unbounded ones do not.
+
 ## M5 — Find action
 
 Verified against domain 0.5.0, cold-storage 0.6.0, kit 0.6.0.
