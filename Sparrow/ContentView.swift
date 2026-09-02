@@ -12,51 +12,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: notebookSelection) {
-                Section("Notebooks") {
-                    ForEach(model.notebooks) { notebook in
-                        Label(notebook.name, systemImage: "book.closed")
-                            .tag(notebook.id)
-                            .contextMenu {
-                                Button("Rename…") { renaming = notebook }
-                                Button("Delete", role: .destructive) {
-                                    Task { await model.delete(notebook.id) }
-                                }
-                            }
-                    }
-                }
-            }
-            .navigationTitle("Sparrow")
-            .toolbar {
-                Button("New Notebook", systemImage: "plus") {
-                    creating = true
-                }
-            }
-            .alert("New Notebook", isPresented: $creating) {
-                TextField("Name", text: $notebookName)
-                Button("Cancel", role: .cancel) { notebookName = "" }
-                Button("Create") {
-                    let name = notebookName
-                    notebookName = ""
-                    Task { await model.createNotebook(named: name) }
-                }
-            }
-            .alert("Rename Notebook", isPresented: renamingBinding) {
-                TextField("Name", text: $notebookName)
-                Button("Cancel", role: .cancel) {
-                    notebookName = ""
-                    renaming = nil
-                }
-                Button("Rename") {
-                    let name = notebookName
-                    let target = renaming
-                    notebookName = ""
-                    renaming = nil
-                    if let target {
-                        Task { await model.rename(target.id, to: name) }
-                    }
-                }
-            }
+            sidebar
         } detail: {
             if let selected = model.notes.first(
                 where: { $0.id == navigator.selectedNoteID }
@@ -67,6 +23,68 @@ struct ContentView: View {
             }
         }
         .task { await model.start() }
+        // The intent already created or found the entry before the app came
+        // forward; this asks for it again to learn *which* note to show.
+        //
+        // ⚠️ Safe only because `openOrCreateDailyNote` is idempotent — the
+        // second call returns the note the first one made. A create-then-open
+        // pair here would produce two entries for one voice command.
+        .onAppIntentExecution(OpenTodaysEntryIntent.self) { _ in
+            Task { await model.openTodaysEntry() }
+        }
+    }
+
+    /// Extracted because the whole `NavigationSplitView` body stopped
+    /// type-checking in reasonable time once the alerts and the intent
+    /// modifier were on it. Splitting a view is the cure the compiler asks
+    /// for, and it reads better anyway.
+    private var sidebar: some View {
+
+        List(selection: notebookSelection) {
+            Section("Notebooks") {
+                ForEach(model.notebooks) { notebook in
+                    Label(notebook.name, systemImage: "book.closed")
+                        .tag(notebook.id)
+                        .contextMenu {
+                            Button("Rename…") { renaming = notebook }
+                            Button("Delete", role: .destructive) {
+                                Task { await model.delete(notebook.id) }
+                            }
+                        }
+                }
+            }
+        }
+        .navigationTitle("Sparrow")
+        .toolbar {
+            Button("New Notebook", systemImage: "plus") {
+                creating = true
+            }
+        }
+        .alert("New Notebook", isPresented: $creating) {
+            TextField("Name", text: $notebookName)
+            Button("Cancel", role: .cancel) { notebookName = "" }
+            Button("Create") {
+                let name = notebookName
+                notebookName = ""
+                Task { await model.createNotebook(named: name) }
+            }
+        }
+        .alert("Rename Notebook", isPresented: renamingBinding) {
+            TextField("Name", text: $notebookName)
+            Button("Cancel", role: .cancel) {
+                notebookName = ""
+                renaming = nil
+            }
+            Button("Rename") {
+                let name = notebookName
+                let target = renaming
+                notebookName = ""
+                renaming = nil
+                if let target {
+                    Task { await model.rename(target.id, to: name) }
+                }
+            }
+        }
     }
 
     private var renamingBinding: Binding<Bool> {
@@ -264,6 +282,16 @@ final class NoteListModel {
                 id,
                 with: NoteEdit(tagIDs: current.tagIDs.filter { $0 != tagID })
             )
+        }
+    }
+
+    /// Opens today's entry and selects it.
+    func openTodaysEntry() async {
+        guard let noteService else { return }
+        await reportingFailure {
+            let note = try await noteService.openOrCreateDailyNote(on: Date())
+            Navigator.shared.select(note: note.id)
+            await self.reload()
         }
     }
 

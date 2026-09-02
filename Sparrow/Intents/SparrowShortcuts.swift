@@ -16,6 +16,15 @@ struct SparrowShortcuts: AppShortcutsProvider {
             systemImageName: "square.and.pencil"
         )
         AppShortcut(
+            intent: OpenTodaysEntryIntent(),
+            phrases: [
+                "Open today's entry in \(.applicationName)",
+                "Open my \(.applicationName) journal",
+            ],
+            shortTitle: "Today's Entry",
+            systemImageName: "calendar.day.timeline.left"
+        )
+        AppShortcut(
             intent: SearchNotesIntent(),
             phrases: [
                 "Search \(.applicationName) for notes",
