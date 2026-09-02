@@ -25,12 +25,12 @@ struct NoteEntityQuery: EntityQuery, EntityStringQuery, IndexedEntityQuery {
     /// NFR-1.3 rests on it as well: `NoteID` is client-generated and stored,
     /// so a shortcut saved before a reinstall still finds its note.
     func entities(for identifiers: [UUID]) async throws -> [NoteEntity] {
-        try await notes.notes(identifiers.map(NoteID.init)).map(NoteEntity.init)
+        try await notes.notes(identifiers.map(NoteID.init)).map { NoteEntity($0) }
     }
 
     /// FR-1.6: what the picker shows before anyone has typed anything.
     func suggestedEntities() async throws -> [NoteEntity] {
-        try await search.suggestions(limit: 6).map(NoteEntity.init)
+        try await search.suggestions(limit: 6).map { NoteEntity($0) }
     }
 
     /// What lets Siri resolve a note by name — "open my heron note" — instead
@@ -40,7 +40,7 @@ struct NoteEntityQuery: EntityQuery, EntityStringQuery, IndexedEntityQuery {
     /// FR-1.3's diacritic folding applies to a spoken query too: someone who
     /// says "heron" finds a note titled "Herón".
     func entities(matching string: String) async throws -> [NoteEntity] {
-        try await search.search(string, limit: 20).map(NoteEntity.init)
+        try await search.search(string, limit: 20).map { NoteEntity($0) }
     }
 
     // MARK: Reindexing, when the system asks
@@ -56,7 +56,7 @@ struct NoteEntityQuery: EntityQuery, EntityStringQuery, IndexedEntityQuery {
     ) async throws {
         let entities = try await notes
             .notes(identifiers.map(NoteID.init))
-            .map(NoteEntity.init)
+            .map { NoteEntity($0) }
         try await CSSearchableIndex(name: SpotlightIndex.name)
             .indexAppEntities(entities)
     }
@@ -64,7 +64,7 @@ struct NoteEntityQuery: EntityQuery, EntityStringQuery, IndexedEntityQuery {
     func reindexAllEntities(
         indexDescription: CSSearchableIndexDescription
     ) async throws {
-        let entities = try await notes.recent(limit: 10_000).map(NoteEntity.init)
+        let entities = try await notes.recent(limit: 10_000).map { NoteEntity($0) }
         let index = CSSearchableIndex(name: SpotlightIndex.name)
         try await index.deleteAllSearchableItems()
         try await index.indexAppEntities(entities)

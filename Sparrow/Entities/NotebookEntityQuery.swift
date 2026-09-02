@@ -10,7 +10,14 @@ import SparrowDomain
 /// FR-1.5 is satisfied with no typing at all. It is only appropriate because
 /// the set is small and local — an enumerable query over ten thousand notes
 /// would be a very different decision.
-struct NotebookEntityQuery: EntityQuery, EnumerableEntityQuery {
+/// ⚠️ `EntityStringQuery` is required by `.notes.createNote`, not chosen.
+///
+/// The extractor refuses a schema intent whose entity parameter cannot be
+/// resolved from a spoken name: *"requires 'NotebookEntity' to conform to
+/// 'IndexedEntity', 'UniqueAppEntity', 'TransientAppEntity', provide a default
+/// 'EntityStringQuery', or provide an 'IntentValueQuery'"*. That is the schema
+/// insisting Siri can say "in my Wetlands notebook" and be understood.
+struct NotebookEntityQuery: EntityQuery, EnumerableEntityQuery, EntityStringQuery {
     @Dependency var notebooks: any NotebookServicing
 
     /// Resolves identifiers the system already holds — from a saved shortcut,
@@ -27,7 +34,21 @@ struct NotebookEntityQuery: EntityQuery, EnumerableEntityQuery {
 
     /// Every notebook, in the order storage returns them.
     func allEntities() async throws -> [NotebookEntity] {
-        try await notebooks.all().map(NotebookEntity.init)
+        try await notebooks.all().map { NotebookEntity($0) }
+    }
+
+    /// Resolves a notebook from a spoken or typed name, case-insensitively —
+    /// which is why `NotebookReading.notebook(named:)` has been
+    /// case-insensitive since 0.2.0.
+    func entities(matching string: String) async throws -> [NotebookEntity] {
+        guard let found = try await notebooks.notebook(named: string) else {
+            // Fall back to a contains match, so "wetland" finds "Wetlands".
+            let all = try await notebooks.all()
+            return all
+                .filter { $0.name.localizedCaseInsensitiveContains(string) }
+                .map { NotebookEntity($0) }
+        }
+        return [NotebookEntity(found)]
     }
 
     /// What the picker shows before anyone has typed or chosen anything.

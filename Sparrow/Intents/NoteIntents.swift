@@ -30,64 +30,51 @@ struct OpenNoteIntent: OpenIntent {
 
 /// Edits a note in place.
 ///
-/// Every parameter is optional, and one left blank means *leave it alone* —
-/// the same three-way distinction `NoteEdit` makes, surfaced to Shortcuts.
-struct UpdateNoteIntent: AppIntent {
-    static let title: LocalizedStringResource = "Update Note"
-
+/// ⚠️ **`@AppIntent(schema: .notes.updateNote)` as of M9.** The schema takes
+/// the parameters it knows — `name`, `content`, `isPinned`, `folder` — and the
+/// ones that were ours are gone from the signature. `kind` and `tags` can no
+/// longer be edited from Shortcuts through this action; that is the price of
+/// the schema, paid deliberately.
+@AppIntent(schema: .notes.updateNote)
+struct UpdateNoteIntent {
     static let description = IntentDescription(
-        "Changes a note's title, text, kind or pin.",
+        "Changes a note's name, text or pin.",
         categoryName: "Notes",
         resultValueName: "Updated Note"
     )
 
     static let openAppWhenRun = false
 
-    @Parameter(title: "Note")
-    var note: NoteEntity
+    @Parameter(title: "Note") var target: NoteEntity
+    @Parameter(title: "Name") var name: String?
+    @Parameter(title: "Content") var content: AttributedString?
+    @Parameter(title: "Pinned") var isPinned: Bool?
+    @Parameter(title: "Notebook") var folder: NotebookEntity?
 
-    @Parameter(title: "New Title")
-    var newTitle: String?
-
-    @Parameter(title: "New Text")
-    var newBody: String?
-
-    @Parameter(title: "Kind")
-    var kind: NoteKindAppEnum?
-
-    @Parameter(title: "Pinned")
-    var isPinned: Bool?
-
-    /// Replaces the note's tags. Leaving it out leaves them alone — the same
-    /// three-way distinction `NoteEdit` makes, surfaced to Shortcuts.
-    @Parameter(title: "Tags")
-    var tags: [TagEntity]?
+    /// Required by the schema even though Sparrow never attaches anything —
+    /// and required to be **optional** here, unlike on `createNote`, where the
+    /// same parameter must not be. The two schemas differ, and only the
+    /// extractor says so.
+    @Parameter(title: "Attachments", supportedTypeIdentifiers: ["public.item"])
+    var attachments: [IntentFile]?
 
     @Dependency var notes: any NoteServicing
-
-    static var parameterSummary: some ParameterSummary {
-        Summary("Update \(\.$note)") {
-            \.$newTitle
-            \.$newBody
-            \.$kind
-            \.$isPinned
-            \.$tags
-        }
-    }
 
     func perform() async throws -> some IntentResult & ReturnsValue<NoteEntity>
         & ProvidesDialog
     {
+        // Each `nil` means *leave it alone* — the same three-way distinction
+        // `NoteEdit` has made since domain 0.3.0, and the schema's parameters
+        // map onto it without translation.
         let edit = NoteEdit(
-            title: newTitle.map { RichText(plain: $0) },
-            body: newBody.map { RichText(plain: $0) },
-            tagIDs: tags.map { $0.compactMap(\.tagID) },
-            kind: kind?.domainKind,
+            title: name.map { RichText(plain: $0) },
+            body: content.map { RichText(plain: String($0.characters)) },
+            notebookID: folder?.notebookID,
             isPinned: isPinned
         )
 
         let updated = try await translatingServiceErrors {
-            try await notes.update(note.noteID, with: edit)
+            try await notes.update(target.noteID, with: edit)
         }
         return .result(
             value: NoteEntity(updated),
@@ -120,12 +107,12 @@ struct DeleteNoteIntent: AppIntent {
         // There is no destructive case in `ConfirmationActionName`, so the
         // button says "Continue" and the sentence has to carry the weight.
         try await requestConfirmation(
-            dialog: "Delete \(note.title)? This can't be undone."
+            dialog: "Delete \(note.name)? This can't be undone."
         )
 
         try await translatingServiceErrors {
             try await notes.delete(note.noteID)
         }
-        return .result(dialog: "Deleted \(note.title).")
+        return .result(dialog: "Deleted \(note.name).")
     }
 }

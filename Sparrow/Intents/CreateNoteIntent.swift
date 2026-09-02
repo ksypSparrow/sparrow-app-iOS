@@ -4,11 +4,17 @@ import SparrowDomain
 
 /// Captures a note without opening the app.
 ///
-/// M9 replaces this with `@AppIntent(schema: .notes.createNote)`. Until then it
-/// is hand-rolled, which is what makes the comparison in M9 worth anything.
-struct CreateNoteIntent: AppIntent {
-    static let title: LocalizedStringResource = "Create Note"
-
+/// ⚠️ **`@AppIntent(schema: .notes.createNote)` as of M9.** The hand-rolled
+/// version shipped in M0 so this milestone would have something to compare
+/// against, and the comparison is instructive: the schema dictates the
+/// parameter names and types, and Siri then handles phrasings nobody wrote a
+/// shortcut for.
+///
+/// What it costs is the parameters that were ours. `kind` and `observedAt` are
+/// gone from the signature — the schema does not have them, and a schema
+/// intent cannot add required parameters.
+@AppIntent(schema: .notes.createNote)
+struct CreateNoteIntent {
     static let description = IntentDescription(
         "Captures a note in Sparrow.",
         categoryName: "Notes",
@@ -18,38 +24,25 @@ struct CreateNoteIntent: AppIntent {
     /// Runs in the background: no scene, no window, no view lifecycle.
     static let openAppWhenRun = false
 
-    @Parameter(
-        title: "Title",
-        requestValueDialog: "What should the note be called?"
-    )
-    var noteTitle: String
+    /// ⚠️ **`String` here, `AttributedString` on the entity.** The intent
+    /// schema and the entity schema disagree about the type of the same
+    /// concept, and both are enforced — by the extractor, not the compiler.
+    @Parameter(title: "Name") var name: String
 
-    @Parameter(title: "Note")
-    var content: String?
+    @Parameter(title: "Content") var content: AttributedString?
 
-    @Parameter(title: "Kind", default: .observation)
-    var kind: NoteKindAppEnum
+    /// `supportedTypeIdentifiers` is mandatory: the extractor refuses an
+    /// attachment parameter that does not say what it accepts.
+    @Parameter(title: "Attachments", supportedTypeIdentifiers: ["public.item"])
+    var attachments: [IntentFile]
 
-    @Parameter(title: "Notebook")
-    var notebook: NotebookEntity?
-
-    /// When the observation happened, which may precede now by hours — a note
-    /// written up in the evening about a bird seen at dawn.
-    @Parameter(title: "Observed")
-    var observedAt: Date?
+    @Parameter(title: "Pinned") var isPinned: Bool
+    @Parameter(title: "Notebook") var folder: NotebookEntity?
 
     /// Resolved from `AppDependencyManager`, which `SparrowApp.init()` fills in.
     /// If that registration ever moves into a view's `.task`, this line is
     /// where a background launch crashes.
     @Dependency var notes: any NoteServicing
-
-    static var parameterSummary: some ParameterSummary {
-        Summary("Create a \(\.$kind) called \(\.$noteTitle)") {
-            \.$content
-            \.$notebook
-            \.$observedAt
-        }
-    }
 
     func perform() async throws -> some IntentResult & ReturnsValue<NoteEntity>
         & ProvidesDialog
@@ -57,16 +50,16 @@ struct CreateNoteIntent: AppIntent {
         let note = try await translatingServiceErrors {
             try await notes.create(
                 NoteDraft(
-                    title: RichText(plain: noteTitle),
-                    body: RichText(plain: content ?? ""),
-                    notebookID: notebook?.notebookID,
-                    kind: kind.domainKind,
-                    observedAt: observedAt
+                    title: RichText(plain: name),
+                    body: RichText(plain: content.map { String($0.characters) } ?? ""),
+                    notebookID: folder?.notebookID
                 )
             )
         }
-        // Returning the entity is what lets a shortcut chain this into
-        // OpenNote or UpdateNote without looking the note up again.
+        // 🔍 **The open question, answered: yes.** A schema intent *can* add
+        // `& ProvidesDialog` to its return type — the macro accepts it, and
+        // FR-1.1 gets its spoken confirmation without falling back to letting
+        // the system compose one.
         return .result(
             value: NoteEntity(note),
             dialog: "Saved \(note.plainTitle)."

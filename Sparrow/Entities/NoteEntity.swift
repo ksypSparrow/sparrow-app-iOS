@@ -9,7 +9,20 @@ import SparrowDomain
 /// a date. An entity is serialised into saved shortcuts, Siri suggestions and
 /// the on-device index; putting a sketch's pixels in one would bloat all three
 /// and copy the note's content somewhere it cannot be revoked.
-struct NoteEntity: AppEntity, IndexedEntity {
+/// ⚠️ **`@AppEntity(schema: .notes.note)`.** The schema dictates the property
+/// names and types, and they are not the ones the requirements used:
+///
+/// ```
+///    title  →  name      String → AttributedString
+///    body   →  content   String → AttributedString?
+///    +         attachments        required, even when always empty
+///    +         folder             an entity reference, not an identifier
+/// ```
+///
+/// This is why M9 was left late: adopting the schema reshapes the type, and
+/// every intent written against the old names has to move with it.
+@AppEntity(schema: .notes.note)
+struct NoteEntity: IndexedEntity {
     static let typeDisplayRepresentation = TypeDisplayRepresentation(
         name: "Note",
         numericFormat: "\(placeholder: .int) notes"
@@ -32,25 +45,66 @@ struct NoteEntity: AppEntity, IndexedEntity {
     /// `indexingKey:` maps each onto the attribute Spotlight already
     /// understands, so searching for a note's title matches the way searching
     /// for a document's title does — rather than only through keywords.
-    @ComputedProperty(indexingKey: \.title) var title: String {
-        note.plainTitle
+    /// `name`, not `title` — the schema's word.
+    ///
+    /// And `AttributedString`, not `String`. The plain projections this
+    /// carried before M9 were the right call for a shortcut payload; the
+    /// schema is not offering the choice. `RichText` has held both halves
+    /// since domain 0.4.0, so the attributed form is here to give.
+    ///
+    /// ⚠️ The schema also dictates the **indexing key**: `\.displayName`, not
+    /// `\.title`. The extractor rejects any other, which is a stricter
+    /// contract than the compiler enforces.
+    @ComputedProperty(
+        title: "Name",
+        indexingKey: \.displayName
+    ) var name: AttributedString {
+        note.title.attributedString()
     }
 
-    @ComputedProperty(indexingKey: \.textContent) var body: String {
-        note.plainBody
+    @ComputedProperty(
+        title: "Content",
+        indexingKey: \.textContent
+    ) var content: AttributedString? {
+        note.plainBody.isEmpty ? nil : note.body.attributedString()
     }
+
+    /// Mandated by the schema, and always empty.
+    ///
+    /// ⚠️ Sparrow has no attachments — FR-1.1 never asked for them. The schema
+    /// requires the property, so it is here and it is `[]`. Leaving it out
+    /// fails the build at *extraction*, not compilation.
+    @Property(title: "Attachments") var attachments: [IntentFile]
+
+    @Property(title: "Created") var creationDate: Date?
+    @Property(title: "Modified") var modificationDate: Date?
+
+    /// The schema wants an **entity**, not an identifier.
+    ///
+    /// Supplying it needs the notebook in hand. Callers that already have the
+    /// notebooks — a query that just listed them — pass it; callers that would
+    /// have to fetch one per note leave it `nil` rather than turning a page of
+    /// results into an N+1.
+    @Property(title: "Notebook") var folder: NotebookEntity?
 
     /// A `customIndexingKey` because there is no standard Spotlight attribute
     /// for "what kind of note this is". The string is what someone would type:
     /// "sketch", "voice".
-    @ComputedProperty(
-        title: "Kind",
-        indexingKey: \.keywords
-    ) var kind: NoteKindAppEnum {
+    /// ⚠️ **Optional now.** Extra properties on a schema-conforming entity
+    /// must be — the same rule that made `tags` optional in M6, arriving for
+    /// `kind` as the schema lands.
+    ///
+    /// ⚠️ No `indexingKey:` — `\.keywords` is `[String]` and this is an enum,
+    /// which the extractor rejects with a misleading "no extractable localized
+    /// title". The kind still reaches Spotlight: `attributeSet` puts its raw
+    /// value in `keywords` directly.
+    @ComputedProperty(title: "Kind") var kind: NoteKindAppEnum? {
         NoteKindAppEnum(note.kind)
     }
 
+    /// Mandated by the schema, and one Sparrow already had.
     @ComputedProperty(title: "Pinned") var isPinned: Bool { note.isPinned }
+
 
     /// ⚠️ **Optional, and it has to be.** Extra properties on an entity that
     /// conforms to an Apple schema must be optional, and `NoteEntity` adopts
@@ -62,21 +116,18 @@ struct NoteEntity: AppEntity, IndexedEntity {
             ? nil
             : note.tagIDs.map { TagEntity(Tag(id: $0, label: $0.slug)) }
     }
+    /// Sparrow's own: when the observation happened, which is not the same as
+    /// when the note was created. Optional, being an extra.
     @ComputedProperty(
         title: "Observed",
         indexingKey: \.contentCreationDate
     ) var observedAt: Date? { note.observedAt }
 
-    @ComputedProperty(
-        title: "Last Edited",
-        indexingKey: \.contentModificationDate
-    ) var updatedAt: Date { note.updatedAt }
-
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
-            title: "\(title.isEmpty ? "Untitled note" : title)",
-            subtitle: "\(body.prefix(80))",
-            image: .init(systemName: kind.symbolName)
+            title: "\(note.plainTitle.isEmpty ? "Untitled note" : note.plainTitle)",
+            subtitle: "\(note.plainBody.prefix(80))",
+            image: .init(systemName: NoteKindAppEnum(note.kind).symbolName)
         )
     }
 
@@ -88,9 +139,13 @@ struct NoteEntity: AppEntity, IndexedEntity {
     /// crosses to the system is text and dates.
     private let note: Note
 
-    init(_ note: Note) {
+    init(_ note: Note, in notebook: Notebook? = nil) {
         self.id = note.id.value
         self.note = note
+        self.attachments = []
+        self.creationDate = note.createdAt
+        self.modificationDate = note.updatedAt
+        self.folder = notebook.map { NotebookEntity($0) }
     }
 
     /// The identifier the service layer speaks.
@@ -109,12 +164,12 @@ extension NoteEntity {
     /// applies to entities.
     var attributeSet: CSSearchableItemAttributeSet {
         let attributes = CSSearchableItemAttributeSet(contentType: .text)
-        attributes.title = title.isEmpty ? "Untitled note" : title
-        attributes.contentDescription = body
+        attributes.title = note.plainTitle.isEmpty ? "Untitled note" : note.plainTitle
+        attributes.contentDescription = note.plainBody
         // What a person would type: "sketch", "voice note".
-        attributes.keywords = [kind.rawValue] + (tags?.map(\.label) ?? [])
-        attributes.contentModificationDate = updatedAt
-        attributes.contentCreationDate = observedAt
+        attributes.keywords = [note.kind.rawValue] + note.tagIDs.map(\.slug)
+        attributes.contentModificationDate = note.updatedAt
+        attributes.contentCreationDate = note.observedAt
         return attributes
     }
 }

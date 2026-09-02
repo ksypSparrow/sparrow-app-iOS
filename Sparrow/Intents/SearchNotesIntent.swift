@@ -48,6 +48,6 @@ struct SearchNotesIntent: AppIntent {
         default: "Found \(found.count) notes."
         }
 
-        return .result(value: found.map(NoteEntity.init), dialog: dialog)
+        return .result(value: found.map { NoteEntity($0) }, dialog: dialog)
     }
 }

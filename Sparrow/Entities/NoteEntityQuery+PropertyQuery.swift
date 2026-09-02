@@ -23,31 +23,31 @@ extension NoteEntityQuery: EntityPropertyQuery {
     typealias ComparatorMappingType = NoteFilter
 
     static let properties = QueryProperties {
-        Property(\NoteEntity.$title) {
-            ContainsComparator { NoteFilter(text: $0) }
+        // `name` and `content`, not `title` and `body` — the schema renamed
+        // them, and a Find action built against the old names would no longer
+        // resolve.
+        Property(\NoteEntity.$name) {
+            ContainsComparator { NoteFilter(text: String($0.characters)) }
         }
-        Property(\NoteEntity.$body) {
-            ContainsComparator { NoteFilter(text: $0) }
-        }
-        Property(\NoteEntity.$kind) {
-            EqualToComparator { NoteFilter(kinds: [$0.domainKind]) }
+        Property(\NoteEntity.$content) {
+            ContainsComparator { NoteFilter(text: String($0.characters)) }
         }
         Property(\NoteEntity.$isPinned) {
             EqualToComparator { NoteFilter(isPinned: $0) }
         }
-        Property(\NoteEntity.$updatedAt) {
+        Property(\NoteEntity.$modificationDate) {
             GreaterThanOrEqualToComparator { since in
-                NoteFilter(updatedWithin: .from(since))
+                NoteFilter(updatedWithin: .from(since ?? .distantPast))
             }
             LessThanOrEqualToComparator { until in
-                NoteFilter(updatedWithin: .until(until))
+                NoteFilter(updatedWithin: .until(until ?? .distantFuture))
             }
         }
     }
 
     static let sortingOptions = SortingOptions {
-        SortableBy(\NoteEntity.$title)
-        SortableBy(\NoteEntity.$updatedAt)
+        SortableBy(\NoteEntity.$name)
+        SortableBy(\NoteEntity.$modificationDate)
         SortableBy(\NoteEntity.$observedAt)
     }
 
@@ -75,7 +75,7 @@ extension NoteEntityQuery: EntityPropertyQuery {
             return try await translatingServiceErrors {
                 try await search.filter(filter, sort: sort, limit: cap)
             }
-            .map(NoteEntity.init)
+            .map { NoteEntity($0) }
         }
 
         // ⚠️ Several comparators are run separately and combined, rather than
@@ -108,7 +108,7 @@ extension NoteEntityQuery: EntityPropertyQuery {
         return (combined ?? [])
             .sorted(by: sort.orders)
             .prefix(cap)
-            .map(NoteEntity.init)
+            .map { NoteEntity($0) }
     }
 
     /// Maps the sort a person chose in Shortcuts onto the domain's vocabulary.
@@ -122,7 +122,7 @@ extension NoteEntityQuery: EntityPropertyQuery {
         guard let first = sorts.first else { return .mostRecent }
 
         let field: NoteSort.Field = switch first.by {
-        case \NoteEntity.$title: .title
+        case \NoteEntity.$name: .title
         case \NoteEntity.$observedAt: .observed
         default: .updated
         }

@@ -83,7 +83,7 @@ actor SpotlightIndexer {
     /// there.
     private func reindexEverything() async {
         guard let all = try? await notes.recent(limit: 10_000) else { return }
-        await Self.replaceAll(with: all.map(NoteEntity.init), in: indexName)
+        await Self.replaceAll(with: all.map { NoteEntity($0) }, in: indexName)
     }
 
     // MARK: The index itself
