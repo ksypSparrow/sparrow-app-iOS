@@ -128,13 +128,73 @@ struct ContentView: View {
                 )
             }
             Button {
-                if let url = URL(string: "shortcuts://") { openURL(url) }
+                if let url = Self.shortcutsAppURL { openURL(url) }
             } label: {
-                Label("Sparrow Shortcuts", systemImage: "square.stack.3d.down.right")
+                Label {
+                    Text("\(Self.appDisplayName) shortcuts")
+                } icon: {
+                    Self.shortcutsIcon
+                }
             }
             // Without this the row is drawn as a button — tinted label, no
             // row highlight — and stops matching the notebook rows above it.
             .buttonStyle(.plain)
+        }
+        #endif
+    }
+
+    // MARK: - Replicating ShortcutsLink
+
+    /// Where `ShortcutsLink` actually goes.
+    ///
+    /// Not `shortcuts://`, which lands on the library root. The framework opens
+    /// `shortcuts://app?bundleID=<our bundle id>`, which opens the app's *own*
+    /// page in the Shortcuts library — the four App Shortcuts, not a list of
+    /// every app on the phone.
+    ///
+    /// 🧪 Read out of `_AppIntents_SwiftUI.framework` in the iOS 27 runtime:
+    /// the binary carries the literal `shortcuts://app?bundleID=` next to
+    /// `bundleIdentifier` and `openURL:options:completionHandler:`.
+    ///
+    /// Built with `URLComponents` rather than string interpolation so a bundle
+    /// id needing escaping cannot produce a malformed URL.
+    private static var shortcutsAppURL: URL? {
+        guard let bundleID = Bundle.main.bundleIdentifier else { return nil }
+        var components = URLComponents()
+        components.scheme = "shortcuts"
+        components.host = "app"
+        components.queryItems = [URLQueryItem(name: "bundleID", value: bundleID)]
+        return components.url
+    }
+
+    /// The name `ShortcutsLink` interpolates into its title.
+    private static var appDisplayName: String {
+        let info = Bundle.main.infoDictionary
+        return info?["CFBundleDisplayName"] as? String
+            ?? info?["CFBundleName"] as? String
+            ?? "Sparrow"
+    }
+
+    /// The Shortcuts glyph the real button draws.
+    ///
+    /// ⚠️ It is Apple artwork, shipped as an asset named `Shortcuts` inside
+    /// `_AppIntents_SwiftUI.framework` — there is no SF Symbol of it and no
+    /// public API that vends it. Loading it by name out of a system framework
+    /// is undocumented and can break in any OS release, so this falls back to
+    /// an SF Symbol whenever the asset is not there. Neither branch copies
+    /// Apple's image into our bundle.
+    @ViewBuilder
+    private static var shortcutsIcon: some View {
+        #if os(iOS)
+        if let bundle = Bundle(identifier: "com.apple.-AppIntents-SwiftUI"),
+           let image = UIImage(named: "Shortcuts", in: bundle, with: nil) {
+            Image(uiImage: image)
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
+        } else {
+            Image(systemName: "square.stack.3d.down.right")
         }
         #endif
     }

@@ -2,6 +2,23 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "%@ shortcuts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ shortcuts"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourcis %@"
+          }
+        }
+      }
+    },
     "A note needs a title or some text.": {
       "extractionState": "manual",
       "localizations": {
@@ -457,23 +474,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sparrow"
-          }
-        }
-      }
-    },
-    "Sparrow Shortcuts": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sparrow Shortcuts"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raccourcis Sparrow"
           }
         }
       }
