@@ -57,6 +57,12 @@ struct ContentView: View {
             }
         }
         .navigationTitle("Sparrow")
+        // ⚠️ FR-1.10 shipped broken through M12 because this line was missing.
+        // `sidebarFooter` existed, was correct, and was never referenced —
+        // and Swift does not warn about an unused private computed property,
+        // so nothing in twelve milestones of building said a word about it.
+        // Only running the app did.
+        .safeAreaInset(edge: .bottom) { sidebarFooter }
         .toolbar {
             Button("New Notebook", systemImage: "plus") {
                 creating = true

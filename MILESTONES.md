@@ -16,6 +16,64 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## Post-M12 — the verification pass
+
+`xcode-select` was pointed at Xcode-beta, which unblocked the six items M12
+could only mark `~`. Running the app changed four of them, found one real bug,
+and cleared one accusation.
+
+### Now verified
+
+| | | evidence |
+|---|---|---|
+| FR-1.1 | create without opening the app | note row written by the intent, app not foreground |
+| FR-1.5 | notebook picker, no typing | `EnumerableEntityQuery` list, cross-process |
+| FR-1.10 | the tip stays dismissed | `showSiriTip => false` survives a cold launch |
+| FR-1.7 | *registration* only | all four shortcuts appear on a clean install |
+
+The Create Note run is the whole stack in one gesture: the parameter summary
+rendered *"Create **Name** note with **Content**"*, the notebook picker listed
+`Field Notes`, the dialog said *"Saved Herb at the weir."*, the row landed with
+the notebook and `is_pinned` I chose, FTS matched `weir`, and the note appeared
+in the app's Recent list. Ten intents · 4 entities all show as Shortcuts actions.
+
+### ⚠️ FR-1.10 shipped broken, and building never said so
+
+`sidebarFooter` was written correctly in M10 — `SiriTipView`, `ShortcutsLink`,
+`@AppStorage` for dismissal — and **never referenced**. Swift does not warn
+about an unused `private` computed property, so twelve green builds and a
+passing metadata gate said nothing. One `.safeAreaInset(edge: .bottom)` fixes
+it. Only running the app found it.
+
+```
+   the lesson   a build proves extraction, never behaviour
+```
+
+### ⚠️ App Shortcut tiles are broken in this simulator, for everyone
+
+Tapping a tile gives *"Unable to run App Shortcut"*:
+
+```
+   E  Sparrow[…] Attempted to fetch Auto Shortcuts,
+                 but couldn't find the AppShortcutsProvider
+```
+
+The metadata is right — `autoShortcutProviderMangledName` is
+`7Sparrow0A9ShortcutsV` with 4 auto-shortcuts — and the runtime cannot resolve
+it. It reproduces **byte-identically in Apple's own unmodified Trails sample**,
+and in Debug as well as Release. Not our bug; an iOS 27 beta simulator defect.
+
+Everything above was therefore run through a user-built shortcut, which does
+not go through the provider lookup.
+
+### Still open
+
+FR-1.2 and FR-1.8 need a device. Our half of FR-1.8 is verified — a cold launch
+hands CoreSpotlight exactly one item (`items/1`) for the one note and the
+request finishes — but Spotlight search returns nothing on the Simulator, which
+is what Apple documents. FR-1.7's voice path needs Siri, and FR-1.3 / FR-1.4 /
+FR-1.6 were already verified from the build.
+
 ## M12 — release
 
 Built against **SparrowDomain 1.0.0**, **SparrowColdStorage 1.0.0**,
