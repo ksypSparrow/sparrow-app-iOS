@@ -19,7 +19,14 @@ struct SparrowApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if let services = AppDependencies.services {
+                RootView(services: services)
+            } else {
+                ContentUnavailableView(
+                    "Storage unavailable",
+                    systemImage: "exclamationmark.triangle"
+                )
+            }
         }
         // ⚠️ Scene targeting, so an intent's navigation reaches a window that
         // is already open rather than spawning another.
