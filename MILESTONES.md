@@ -16,6 +16,71 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M11 — localization
+
+Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.9.0.
+
+```
+   ✓  the NL trainer logs phrase templates for BOTH locales    NFR-1.1
+   ✓  no user-facing String literal outside a catalog
+   ✓  INAlternativeAppNames with pronunciation hints
+   ✓  en.lproj and fr.lproj both ship in the bundle
+   ~  Shortcuts reads naturally in the second language
+   ~  every response works on AirPods with the screen off
+```
+
+### NFR-1.1, in the build log
+
+```
+   Training 'New note in ${+applicationName}|…' for en
+   Training 'Nouvelle note dans ${+applicationName}|…' for fr
+   …
+   Training Negative Phrases '' for en
+   Training Negative Phrases '' for fr
+```
+
+Five phrase sets per locale. `appintentsnltrainingprocessor` has printed
+`for en` on every build since M0; this is the first time it prints twice.
+
+**`${applicationName}` survives translation.** It is a token the trainer
+substitutes, not a word — a translator who localised it would break the
+matching, and nothing would report it.
+
+### Three catalogs, not one
+
+| | |
+|---|---|
+| `AppShortcuts.xcstrings` | the phrases Siri matches |
+| `AppIntents.xcstrings` | intent titles, parameter names, dialogs |
+| `Localizable.xcstrings` | everything the UI says |
+
+Kit carries its own for `ServiceError`. That is the wave-0 boundary showing up
+in the localization work: the app maps `ServiceError` into `SparrowIntentError`,
+so it owns those strings while kit owns the originals.
+
+### The literal check found three
+
+A grep over the APIs that show a string to a person — `Text`, `Button`,
+`IntentDescription`, `dialog:`, `title:` and the rest — against the catalogs'
+keys turned up `"Created"`, `"Modified"` and `"Here's today's entry."`. Added
+rather than waved through; the gate says *no* literal, and eyeballing a
+40-string catalog does not prove that.
+
+### `INAlternativeAppNames` needs a real `Info.plist`
+
+`INFOPLIST_KEY_INAlternativeAppNames` takes a comma list and **cannot express
+a pronunciation hint** — the key is an array of dictionaries. So the app has an
+`Info.plist` again, merged with the generated keys.
+
+⚠️ It lives *outside* `Sparrow/`, because the synchronized folder group would
+otherwise copy it as a resource *and* use it as the Info.plist:
+
+> error: Multiple commands produce … /Sparrow.app/Info.plist
+
+The hint matters more than it looks: a mis-heard app name means the phrase
+never matches, and the person concludes the shortcut is broken rather than
+mispronounced.
+
 ## M10 — navigation and UI
 
 Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.8.0 — **no package
