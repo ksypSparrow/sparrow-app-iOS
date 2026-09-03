@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ksypSparrow/sparrow-kit",
       "state" : {
-        "revision" : "636ee30fb3a8aa654ae0ed1fa1d238b3a5d8e8d8",
-        "version" : "1.2.0"
+        "revision" : "e3e7f8508976a3abb3525daca899d735f8ecbcd1",
+        "version" : "2.0.0"
       }
     }
   ],
