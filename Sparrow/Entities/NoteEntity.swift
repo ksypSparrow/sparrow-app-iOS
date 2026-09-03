@@ -206,21 +206,14 @@ enum NoteKindAppEnum: String, AppEnum {
     }
 
     init(_ kind: NoteKind) {
-        // ⚠️ This switch used to be a tripwire: add a case to `NoteKind` and the
-        // compiler stopped you here. `SparrowDomain` now ships as a resilient
-        // binary, so its enums are no longer frozen and the compiler asks for
-        // `@unknown default` instead — which is the opposite of a tripwire. A
-        // new domain kind will silently arrive as `.observation` rather than
-        // failing the build.
-        //
-        // Marking `NoteKind` `@frozen` in the domain would bring the tripwire
-        // back and make a new case an explicit major bump.
+        // The raw values match by construction; the switch is what makes the
+        // compiler complain if the domain ever gains a case. `NoteKind` is
+        // `@frozen` since domain 2.0.0, which is what keeps that true.
         switch kind {
         case .observation: self = .observation
         case .sketch: self = .sketch
         case .voice: self = .voice
         case .daily: self = .daily
-        @unknown default: self = .observation
         }
     }
 

@@ -281,7 +281,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
