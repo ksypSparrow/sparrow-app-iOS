@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Names Siri will accept for this app, and how to hear them.
+
+	     The pronunciation hint is the point: "Sparrow" is easy, but a
+	     mis-heard app name means the phrase never matches and the person
+	     concludes the shortcut is broken rather than mispronounced. -->
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Sparrow Notes</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>Spa row Notes</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Sparrow Field Notes</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>Spa row Field Notes</string>
+		</dict>
+	</array>
+</dict>
+</plist>
