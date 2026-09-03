@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A29F3C778EC54D62A2F6A979 /* SparrowDomain */; };
-		E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */ = {isa = PBXBuildFile; productRef = A561B186FC250430F1D14C2F /* ServiceContracts */; };
-		DEC0F1E299F44D8DCAB4777A /* Services in Frameworks */ = {isa = PBXBuildFile; productRef = 88B0E2F722A90E20634A2C3D /* Services */; };
 		D43B53BCDD3054D1E370C964 /* ColdStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 62928E19BB104EDF276DE340 /* ColdStorage */; };
+		DEC0F1E299F44D8DCAB4777A /* Services in Frameworks */ = {isa = PBXBuildFile; productRef = 88B0E2F722A90E20634A2C3D /* Services */; };
+		E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */ = {isa = PBXBuildFile; productRef = A561B186FC250430F1D14C2F /* ServiceContracts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,7 +18,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		67D99A50C43AB7AF1197937A /* Sparrow */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Sparrow; sourceTree = "<group>"; };
+		67D99A50C43AB7AF1197937A /* Sparrow */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sparrow;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,20 +40,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E50290A24C49A459B43487C5 = {
-			isa = PBXGroup;
-			children = (
-				67D99A50C43AB7AF1197937A /* Sparrow */,
-				328EC33DF3954DC9B83FA285 /* Products */,
-			);
-			sourceTree = "<group>";
-		};
 		328EC33DF3954DC9B83FA285 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				85673086EF6CFD3A1F8591AF /* Sparrow.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E50290A24C49A459B43487C5 = {
+			isa = PBXGroup;
+			children = (
+				67D99A50C43AB7AF1197937A /* Sparrow */,
+				328EC33DF3954DC9B83FA285 /* Products */,
+			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -142,82 +146,31 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		D08DD63EED508AD30D0CB0B4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SWIFT_VERSION = 6.0;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_TESTABILITY = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				ONLY_ACTIVE_ARCH = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
 		811CB99F7A296F7846C18A7F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SWIFT_VERSION = 6.0;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				MTL_ENABLE_DEBUG_INFO = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
-		};
-		FDA287C7C64DC2E983A802E8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Sparrow;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
 		};
 		88E6700796B683108D5F4889 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -228,6 +181,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -235,6 +189,56 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		D08DD63EED508AD30D0CB0B4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		FDA287C7C64DC2E983A802E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sparrow;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -260,14 +264,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ksypSparrow/sparrow-domain";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-cold-storage";
@@ -284,9 +280,27 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ksypSparrow/sparrow-domain";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		62928E19BB104EDF276DE340 /* ColdStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */;
+			productName = ColdStorage;
+		};
+		88B0E2F722A90E20634A2C3D /* Services */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
+			productName = Services;
+		};
 		A29F3C778EC54D62A2F6A979 /* SparrowDomain */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */;
@@ -296,16 +310,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
 			productName = ServiceContracts;
-		};
-		88B0E2F722A90E20634A2C3D /* Services */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
-			productName = Services;
-		};
-		62928E19BB104EDF276DE340 /* ColdStorage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */;
-			productName = ColdStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

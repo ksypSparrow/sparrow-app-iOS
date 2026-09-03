@@ -127,6 +127,11 @@ struct ContentView: View {
                     isVisible: $showSiriTip
                 )
             }
+            NavigationLink {
+                AvailableShortcutsView()
+            } label: {
+                Label("Available Shortcuts", systemImage: "list.bullet.rectangle")
+            }
             Button {
                 if let url = Self.shortcutsAppURL { openURL(url) }
             } label: {
