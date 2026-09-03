@@ -18,6 +18,19 @@ enum AppDependencies {
     /// Held so the subscription outlives `register()`.
     private(set) nonisolated(unsafe) static var spotlightIndexer: SpotlightIndexer?
 
+    /// The services a view model needs, once `register()` has run.
+    @MainActor
+    static var services: AppServices? {
+        guard let noteService, let notebookService, let searchService, let tagService
+        else { return nil }
+        return AppServices(
+            notes: noteService,
+            notebooks: notebookService,
+            search: searchService,
+            tags: tagService
+        )
+    }
+
     /// Where the database lives. Application Support, not Documents — this is
     /// app-managed state, not something a person files or opens themselves.
     static var storeURL: URL {
