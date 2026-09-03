@@ -183,6 +183,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				MARKETING_VERSION = 0.1;
+				CODE_SIGN_ENTITLEMENTS = Sparrow.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -233,6 +234,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				MARKETING_VERSION = 0.1;
+				CODE_SIGN_ENTITLEMENTS = Sparrow.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sparrow.fieldnotes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -1,7 +1,7 @@
 {
   "sourceLanguage": "en",
-  "version": "1.0",
   "strings": {
+    "%@": {},
     "%@ shortcuts": {
       "extractionState": "manual",
       "localizations": {
@@ -19,6 +19,9 @@
         }
       }
     },
+    "%lld notebooks": {},
+    "%lld notes": {},
+    "%lld tags": {},
     "A note needs a title or some text.": {
       "extractionState": "manual",
       "localizations": {
@@ -70,23 +73,7 @@
         }
       }
     },
-    "A · SiriTipView": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A · SiriTipView"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A · SiriTipView"
-          }
-        }
-      }
-    },
+    "Account": {},
     "Add": {
       "extractionState": "manual",
       "localizations": {
@@ -121,57 +108,8 @@
         }
       }
     },
-    "Available Shortcuts": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available Shortcuts"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raccourcis disponibles"
-          }
-        }
-      }
-    },
-    "B · Written by hand": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "B · Written by hand"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "B · Écrit à la main"
-          }
-        }
-      }
-    },
-    "C · From the build metadata": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "C · From the build metadata"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "C · Depuis les métadonnées"
-          }
-        }
-      }
-    },
+    "Adds a notebook to Sparrow.": {},
+    "Attachments": {},
     "Cancel": {
       "extractionState": "manual",
       "localizations": {
@@ -189,6 +127,10 @@
         }
       }
     },
+    "Captures a note in Sparrow.": {},
+    "Changes a note's name, text or pin.": {},
+    "Changes a notebook's name.": {},
+    "Content": {},
     "Couldn't do that": {
       "extractionState": "manual",
       "localizations": {
@@ -223,6 +165,11 @@
         }
       }
     },
+    "Create Notebook": {},
+    "Create a notebook called ${name}": {},
+    "Created": {},
+    "Created %@.": {},
+    "Daily Entry": {},
     "Delete": {
       "extractionState": "manual",
       "localizations": {
@@ -240,6 +187,44 @@
         }
       }
     },
+    "Delete ${notebook}": {},
+    "Delete ${note}": {},
+    "Delete %@? This can't be undone.": {},
+    "Delete Note": {},
+    "Delete Notebook": {},
+    "Deleted %@.": {},
+    "Deletes a note.": {},
+    "Deletes a notebook. It must be empty.": {},
+    "Finds notes by their text, kind, pin or when they were edited.": {},
+    "Finds notes matching some text.": {},
+    "Found %lld notes.": {},
+    "Found one note.": {},
+    "Here's today's entry.": {},
+    "Inside": {},
+    "Kind": {},
+    "Limit": {},
+    "Loading…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chargement…"
+          }
+        }
+      }
+    },
+    "Matching Notes": {},
+    "Modified": {},
+    "Name": {},
+    "New Name": {},
+    "New Note": {},
     "New Notebook": {
       "extractionState": "manual",
       "localizations": {
@@ -274,6 +259,7 @@
         }
       }
     },
+    "No notes match %@.": {},
     "No notes yet.": {
       "extractionState": "manual",
       "localizations": {
@@ -291,6 +277,9 @@
         }
       }
     },
+    "Note": {},
+    "Note Kind": {},
+    "Notebook": {},
     "Notebooks": {
       "extractionState": "manual",
       "localizations": {
@@ -325,23 +314,7 @@
         }
       }
     },
-    "Nothing extracted.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nothing extracted."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rien n’a été extrait."
-          }
-        }
-      }
-    },
+    "Nothing matches “%@”.": {},
     "OK": {
       "extractionState": "manual",
       "localizations": {
@@ -359,6 +332,8 @@
         }
       }
     },
+    "Observation": {},
+    "Observed": {},
     "On This Device": {
       "extractionState": "manual",
       "localizations": {
@@ -376,6 +351,13 @@
         }
       }
     },
+    "Open ${target}": {},
+    "Open Note": {},
+    "Open Notebook": {},
+    "Open Today's Entry": {},
+    "Opens Sparrow on a note.": {},
+    "Opens Sparrow on a notebook.": {},
+    "Opens today's journal entry, starting one if today has none.": {},
     "Pin": {
       "extractionState": "manual",
       "localizations": {
@@ -393,6 +375,7 @@
         }
       }
     },
+    "Pinned": {},
     "Recent": {
       "extractionState": "manual",
       "localizations": {
@@ -410,6 +393,7 @@
         }
       }
     },
+    "Remove %@": {},
     "Rename": {
       "extractionState": "manual",
       "localizations": {
@@ -427,6 +411,7 @@
         }
       }
     },
+    "Rename ${notebook} to ${name}": {},
     "Rename Notebook": {
       "extractionState": "manual",
       "localizations": {
@@ -444,6 +429,7 @@
         }
       }
     },
+    "Renamed to %@.": {},
     "Rename…": {
       "extractionState": "manual",
       "localizations": {
@@ -495,6 +481,8 @@
         }
       }
     },
+    "Saved %@.": {},
+    "Search Notes": {},
     "Search notes": {
       "extractionState": "manual",
       "localizations": {
@@ -512,6 +500,7 @@
         }
       }
     },
+    "Search notes for ${query}": {},
     "Siri & Shortcuts": {
       "extractionState": "manual",
       "localizations": {
@@ -529,6 +518,7 @@
         }
       }
     },
+    "Sketch": {},
     "Something went wrong.": {
       "extractionState": "manual",
       "localizations": {
@@ -580,6 +570,9 @@
         }
       }
     },
+    "Tag": {},
+    "Tags": {},
+    "Text": {},
     "That note no longer exists.": {
       "extractionState": "manual",
       "localizations": {
@@ -665,6 +658,7 @@
         }
       }
     },
+    "Today's Entry": {},
     "Unpin": {
       "extractionState": "manual",
       "localizations": {
@@ -715,6 +709,52 @@
           }
         }
       }
-    }
-  }
+    },
+    "Updated %@.": {},
+    "Updated Note": {},
+    "Voice Note": {},
+    "What should I look for?": {},
+    "What should it be called?": {},
+    "What should the notebook be called?": {},
+    "Your Shortcuts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Shortcuts"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos raccourcis"
+          }
+        }
+      }
+    },
+    "filter": {},
+    "find": {},
+    "iOS returned no shortcuts for this app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS returned no shortcuts for this app."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS n’a renvoyé aucun raccourci pour cette app."
+          }
+        }
+      }
+    },
+    "note": {},
+    "search": {},
+    "“%@”": {}
+  },
+  "version": "1.0"
 }

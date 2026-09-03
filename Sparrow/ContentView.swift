@@ -130,7 +130,7 @@ struct ContentView: View {
             NavigationLink {
                 AvailableShortcutsView()
             } label: {
-                Label("Available Shortcuts", systemImage: "list.bullet.rectangle")
+                Label("Your Shortcuts", systemImage: "list.bullet.rectangle")
             }
             Button {
                 if let url = Self.shortcutsAppURL { openURL(url) }

@@ -1,231 +1,150 @@
 /*
 Abstract:
-Three ways to show an app's own App Shortcuts inside the app, side by side, so
-the trade-offs can be compared on a real device rather than argued about.
+Listing the shortcuts the *user* built in the Shortcuts app, from inside Sparrow.
 */
 
-import AppIntents
+import Intents
 import SwiftUI
 
-/// Three implementations of "show the available shortcuts", built together.
+/// The user's own shortcuts, as far as iOS will show them to us.
 ///
-/// The obvious approach does not exist: `AppShortcut` is **write-only**. It has
-/// four initializers and no readable properties, so `SparrowShortcuts.appShortcuts`
-/// cannot be iterated for display, and nothing in AppIntents returns the phrases
-/// the system resolved. Every approach below works around that.
+/// There is exactly one public API for this — `INVoiceShortcutCenter`, from the
+/// SiriKit era — and Apple's header states its limits plainly:
 ///
-/// | | source of the phrase | layout control | runs the intent |
-/// |---|---|---|---|
-/// | A | the system | none | tapping the tip |
-/// | B | retyped in this file | total | yes, `Button(intent:)` |
-/// | C | the build metadata | total | no — identifiers are strings |
+/// > Get all of the shortcuts **associated with this app** that have been added
+/// > to Siri. These could have either been added with
+/// > `INUIAddVoiceShortcutViewController`, or separately by the user in the
+/// > Shortcuts app.
+///
+/// So an app can see shortcuts built around *its own* intents, and nothing else.
+/// There is no API that lists the Shortcuts library, and there cannot be: those
+/// shortcuts live in the Shortcuts app's container, which is outside our sandbox.
+///
+/// ⚠️ It is a SiriKit API, and `INShortcut` wraps an `INIntent` or an
+/// `NSUserActivity` — neither of which is an App Intent. Whether a shortcut
+/// built on a modern `AppIntent` comes back here at all is the open question
+/// this screen exists to answer, so it reports exactly what it got.
 struct AvailableShortcutsView: View {
+    @State private var model = UserShortcutsModel()
+
     var body: some View {
         List {
-            systemSection
-            authoredSection
-            metadataSection
+            Section {
+                switch model.state {
+                case .loading:
+                    HStack { ProgressView(); Text("Loading…") }
+                case .failed(let message):
+                    Label(message, systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.secondary)
+                case .loaded(let shortcuts) where shortcuts.isEmpty:
+                    Text("iOS returned no shortcuts for this app.")
+                        .foregroundStyle(.secondary)
+                case .loaded(let shortcuts):
+                    ForEach(shortcuts) { shortcut in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("“\(shortcut.phrase)”")
+                            Text(shortcut.detail)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            } header: {
+                Text("Your Shortcuts")
+            } footer: {
+                Text("From INVoiceShortcutCenter — the only public API for this. "
+                     + "It returns shortcuts built on this app's intents and "
+                     + "added to Siri. The rest of the Shortcuts library is "
+                     + "outside our sandbox and cannot be read.")
+            }
         }
-        .navigationTitle("Available Shortcuts")
+        .navigationTitle("Your Shortcuts")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .task { await model.load() }
+        .refreshable { await model.load() }
+    }
+}
+
+/// One row's worth of an `INVoiceShortcut`.
+struct UserShortcut: Identifiable, Sendable {
+    let id: UUID
+    let phrase: String
+    /// What the shortcut is actually built on, reported rather than guessed at.
+    let detail: String
+}
+
+@MainActor
+@Observable
+final class UserShortcutsModel {
+    enum State {
+        case loading
+        case loaded([UserShortcut])
+        case failed(String)
     }
 
-    // MARK: - A. Apple's own view
+    private(set) var state: State = .loading
 
-    /// One `SiriTipView` per intent — the only supported way to show a phrase.
-    ///
-    /// The system resolves the phrase itself, so it is always the real one,
-    /// already localized, with `${applicationName}` substituted and no second
-    /// copy to drift. The cost is that the look is Apple's and not ours.
-    ///
-    /// ⚠️ Renders as a grey placeholder wherever the system cannot resolve the
-    /// `AppShortcutsProvider` — which is every iOS 27 beta simulator, Apple's
-    /// own sample included. On a device it fills in.
-    private var systemSection: some View {
-        Section {
-            #if os(iOS)
-            SiriTipView(intent: CreateNoteIntent())
-            SiriTipView(intent: OpenTodaysEntryIntent())
-            SiriTipView(intent: SearchNotesIntent())
-            SiriTipView(intent: OpenNoteIntent())
-            #endif
-        } header: {
-            Text("A · SiriTipView")
-        } footer: {
-            Text("Apple's own view, one per intent. Always the real phrase, "
-                 + "already localized. No control over the look.")
+    func load() async {
+        state = .loading
+        do {
+            state = .loaded(try await Self.fetch())
+        } catch let error as NSError {
+            state = .failed(Self.explain(error))
         }
     }
 
-    // MARK: - B. Written out by hand
-
-    /// Rows we draw ourselves, from phrases retyped here.
+    /// `getAllVoiceShortcuts` is a completion-handler API and can call back with
+    /// neither a value nor an error, so the continuation resumes with an empty
+    /// list rather than leaking a suspended task.
     ///
-    /// ⚠️ This is two definitions of one meaning — the failure mode this
-    /// codebase has hit three times. It cannot be avoided by sharing a
-    /// constant: `AppShortcutPhrase` does have `init(_ value: String)`, but the
-    /// build-time extractor reads *source literals*, so a phrase behind a
-    /// constant would vanish from `nlu.appintents` and Siri would stop matching
-    /// it. The duplication is the price of this approach, not an oversight.
-    private var authoredSection: some View {
-        Section {
-            #if os(iOS)
-            Button(intent: CreateNoteIntent()) {
-                AuthoredRow(
-                    title: "New Note",
-                    symbol: "square.and.pencil",
-                    phrase: "New note in \(Self.appName)"
-                )
-            }
-            Button(intent: OpenTodaysEntryIntent()) {
-                AuthoredRow(
-                    title: "Today's Entry",
-                    symbol: "calendar.day.timeline.left",
-                    phrase: "Open today's entry in \(Self.appName)"
-                )
-            }
-            Button(intent: SearchNotesIntent()) {
-                AuthoredRow(
-                    title: "Search Notes",
-                    symbol: "magnifyingglass",
-                    phrase: "Search \(Self.appName) for notes"
-                )
-            }
-            #endif
-        } header: {
-            Text("B · Written by hand")
-        } footer: {
-            Text("Total control, and the rows actually run the intent. "
-                 + "The phrases are retyped here, so they can drift.")
-        }
-    }
-
-    // MARK: - C. Read back out of the build
-
-    /// Rows built from `Metadata.appintents/extract.actionsdata` in our own bundle.
-    ///
-    /// The App Intents compiler plugin writes this file from the very
-    /// `SparrowShortcuts` declaration Siri uses, so the phrases cannot drift —
-    /// there is exactly one source and this reads it rather than repeating it.
-    ///
-    /// ⚠️ The file's format is undocumented. Nothing here is private API — it is
-    /// our own bundle, read with `JSONDecoder` — but Apple may change the shape
-    /// in any release, so it fails soft to an empty section.
-    ///
-    /// ⚠️ Display only. The metadata identifies intents by *name*, and a String
-    /// cannot be turned back into an `AppIntent`, so these rows cannot run.
-    private var metadataSection: some View {
-        Section {
-            if ExtractedShortcut.all.isEmpty {
-                Text("Nothing extracted.")
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(ExtractedShortcut.all) { shortcut in
-                    AuthoredRow(
-                        title: shortcut.title,
-                        symbol: shortcut.systemImageName,
-                        phrase: shortcut.phrases.first ?? ""
+    /// ⚠️ `INVoiceShortcut` is not `Sendable`, so the mapping happens *inside*
+    /// the callback and only our own value type crosses the continuation.
+    nonisolated private static func fetch() async throws -> [UserShortcut] {
+        try await withCheckedThrowingContinuation { continuation in
+            INVoiceShortcutCenter.shared.getAllVoiceShortcuts { shortcuts, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let rows = (shortcuts ?? []).map { voice in
+                    UserShortcut(
+                        id: voice.identifier,
+                        phrase: voice.invocationPhrase,
+                        detail: describe(voice.shortcut)
                     )
                 }
+                continuation.resume(returning: rows)
             }
-        } header: {
-            Text("C · From the build metadata")
-        } footer: {
-            Text("Read from the file the compiler wrote, so it cannot drift. "
-                 + "Undocumented format, and the rows cannot run the intent.")
         }
     }
 
-    fileprivate static var appName: String {
-        let info = Bundle.main.infoDictionary
-        return info?["CFBundleDisplayName"] as? String
-            ?? info?["CFBundleName"] as? String
-            ?? "Sparrow"
-    }
-}
-
-/// One row, shared by B and C so the comparison is about the data source and
-/// not about two different row designs.
-private struct AuthoredRow: View {
-    let title: String
-    let symbol: String
-    let phrase: String
-
-    var body: some View {
-        Label {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                Text("“\(phrase)”")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-        } icon: {
-            Image(systemName: symbol)
-        }
-    }
-}
-
-// MARK: - Reading the extracted metadata
-
-/// One App Shortcut, as the App Intents compiler plugin recorded it.
-struct ExtractedShortcut: Identifiable {
-    let id: String
-    let title: String
-    let systemImageName: String
-    let phrases: [String]
-
-    /// Everything the plugin extracted, localized, with the app name filled in.
+    /// 🧪 `INIntentErrorVoiceShortcutGetFailed` (7001) is what you get with no
+    /// Siri entitlement. `siriactionsd` logs the real reason and it is blunt:
     ///
-    /// Parsed once. The titles and phrases come back as the *keys* the plugin
-    /// wrote, which are exactly the keys in `AppShortcuts.xcstrings`, so they
-    /// localize through the same table Siri uses.
-    static let all: [ExtractedShortcut] = load()
-
-    private static func load() -> [ExtractedShortcut] {
-        guard let url = Bundle.main.url(
-            forResource: "extract",
-            withExtension: "actionsdata",
-            subdirectory: "Metadata.appintents"
-        ), let data = try? Data(contentsOf: url) else { return [] }
-
-        struct File: Decodable {
-            struct Shortcut: Decodable {
-                struct Key: Decodable { let key: String }
-                let actionIdentifier: String
-                let shortTitle: Key?
-                let systemImageName: String?
-                let phraseTemplates: [Key]?
-            }
-            let autoShortcuts: [Shortcut]?
+    /// > Rejecting connection … because it has insufficient privileges:
+    /// > `<VCAccessSpecifier: entitlements=>`
+    ///
+    /// The entitlement cannot simply be added here. Signing ad-hoc with
+    /// `com.apple.developer.siri` and no provisioning profile makes iOS refuse
+    /// to launch the app at all — verified against a control that re-signed
+    /// identically with an empty dictionary and launched fine.
+    nonisolated private static func explain(_ error: NSError) -> String {
+        guard error.domain == "IntentsErrorDomain", error.code == 7001 else {
+            return error.localizedDescription
         }
-
-        guard let file = try? JSONDecoder().decode(File.self, from: data) else {
-            return []
-        }
-
-        return (file.autoShortcuts ?? []).map { shortcut in
-            ExtractedShortcut(
-                id: shortcut.actionIdentifier,
-                title: shortcut.shortTitle.map { localized($0.key) }
-                    ?? shortcut.actionIdentifier,
-                systemImageName: shortcut.systemImageName ?? "app",
-                phrases: (shortcut.phraseTemplates ?? []).map { localized($0.key) }
-            )
-        }
+        return "Needs the Siri capability. This build is unsigned, so "
+            + "iOS refuses the request (error 7001)."
     }
 
-    /// Through `AppShortcuts.xcstrings` — the table Siri itself reads — then
-    /// `${applicationName}`, which the metadata leaves as a token.
-    private static func localized(_ key: String) -> String {
-        let translated = String(
-            localized: String.LocalizationValue(key),
-            table: "AppShortcuts"
-        )
-        return translated.replacingOccurrences(
-            of: "${applicationName}",
-            with: AvailableShortcutsView.appName
-        )
+    nonisolated private static func describe(_ shortcut: INShortcut) -> String {
+        if let intent = shortcut.intent {
+            return "INIntent · \(type(of: intent))"
+        }
+        if let activity = shortcut.userActivity {
+            return "NSUserActivity · \(activity.activityType)"
+        }
+        return "neither an intent nor an activity"
     }
 }
