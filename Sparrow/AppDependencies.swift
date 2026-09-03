@@ -1,14 +1,13 @@
 import AppIntents
-import ColdStorage
 import Foundation
 import ServiceContracts
-import Services
+import SparrowAssembly
 
-/// The composition root, and the only place in the app that names `ColdStorage`.
+/// Where the app collects its dependencies and hands them to the system.
 ///
-/// Everything below is handed out as a protocol. A view or an intent that wants
-/// notes receives `any NoteServicing` and cannot discover that storage exists,
-/// let alone that it is a dictionary today and SQLite from M1.
+/// The wiring itself lives in `SparrowAssembly`. This app names no store, no
+/// service implementation and no database — it asks kit for a set of protocols
+/// and registers them. Nothing here can discover that SQLite exists.
 enum AppDependencies {
     /// Set once, during `SparrowApp.init()`, before any scene or intent runs.
     private(set) nonisolated(unsafe) static var noteService: (any NoteServicing)?
@@ -40,38 +39,17 @@ enum AppDependencies {
     }
 
     static func register() throws {
-        // M0 called `.inMemory()` here. This is the whole diff: one line, and
-        // nothing above it changed. That was the point of returning protocols.
-        let storage = try ColdStorage.make(at: storeURL)
+        // The one line that used to be `ColdStorage.make(at:)` behind an
+        // `import ColdStorage`. Swapping this for `.inMemory()` is still a
+        // one-line change — it just no longer costs the app a dependency on
+        // storage to make it.
+        let services = try SparrowAssembly.onDisk(at: storeURL)
 
-        // One relay for the whole app. Two would mean a view listening to the
-        // wrong one, silently.
-        let relay = ChangeRelay()
-
-        let notes = NoteService(
-            notes: storage.notes,
-            notebooks: storage.notebooks,
-            transactions: storage.transactions,
-            relay: relay
-        )
-        let notebooks = NotebookService(
-            notebooks: storage.notebooks,
-            transactions: storage.transactions,
-            relay: relay
-        )
-        // Holds a reader and an index, and nothing that can write — so
-        // searching cannot change anything, structurally.
-        let search = SearchService(notes: storage.notes, index: storage.search)
-        let tags = TagService(
-            tags: storage.tags,
-            transactions: storage.transactions,
-            relay: relay
-        )
-
+        let notes = services.notes
         noteService = notes
-        notebookService = notebooks
-        searchService = search
-        tagService = tags
+        notebookService = services.notebooks
+        searchService = services.search
+        tagService = services.tags
 
         // Spotlight follows the same change stream the UI does. It is a
         // consumer of `NoteServicing.changes`, published since kit 0.1.0 —
@@ -80,23 +58,12 @@ enum AppDependencies {
         spotlightIndexer = indexer
         Task { await indexer.start() }
 
-        // Every write that goes through *this process's* storage reaches the
-        // UI through here, whoever made it — a view, an intent, or a widget
-        // hosted in-process.
-        //
-        // ⚠️ Not cross-process. The broadcaster lives in this instance of
-        // ColdStorage, so a separate extension writing the same file would go
-        // unnoticed. That needs `DatabaseRegionObservation` or a Darwin
-        // notification, and it is not in V1.
-        Task { await relay.start(consuming: storage.observer.changes) }
-
-        // Registered as protocols, not as the actors. An intent that could
-        // name `NoteService` could reach past the contract it is meant to use.
-        AppDependencyManager.shared.add(dependency: notes as any NoteServicing)
-        AppDependencyManager.shared
-            .add(dependency: notebooks as any NotebookServicing)
-        AppDependencyManager.shared.add(dependency: search as any SearchServicing)
-        AppDependencyManager.shared.add(dependency: tags as any TagServicing)
+        // Registered as protocols, which is now the only thing they can be —
+        // the app never sees a concrete service type to register by mistake.
+        AppDependencyManager.shared.add(dependency: services.notes)
+        AppDependencyManager.shared.add(dependency: services.notebooks)
+        AppDependencyManager.shared.add(dependency: services.search)
+        AppDependencyManager.shared.add(dependency: services.tags)
         // ⚠️ Not `add(dependency: Navigator.shared)`. That overload takes a
         // `@Sendable` autoclosure, and `Navigator` is `@MainActor`, so the
         // reference cannot be made from inside one. The async provider
