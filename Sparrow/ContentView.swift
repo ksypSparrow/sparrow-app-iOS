@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var notebookName = ""
     /// FR-1.10. `@AppStorage`, so dismissal survives a launch.
     @AppStorage("showSiriTip") private var showSiriTip = true
+    @Environment(\.openURL) private var openURL
     @State private var creating = false
     @State private var renaming: Notebook?
 
@@ -55,14 +56,9 @@ struct ContentView: View {
                         }
                 }
             }
+            siriSection
         }
         .navigationTitle("Sparrow")
-        // ⚠️ FR-1.10 shipped broken through M12 because this line was missing.
-        // `sidebarFooter` existed, was correct, and was never referenced —
-        // and Swift does not warn about an unused private computed property,
-        // so nothing in twelve milestones of building said a word about it.
-        // Only running the app did.
-        .safeAreaInset(edge: .bottom) { sidebarFooter }
         .toolbar {
             Button("New Notebook", systemImage: "plus") {
                 creating = true
@@ -95,31 +91,116 @@ struct ContentView: View {
         }
     }
 
-    /// The Siri tip and the Shortcuts link.
+    /// The Siri tip and a plain row that opens the Shortcuts app.
+    ///
+    /// These used to float in a `.safeAreaInset`, pinned over the content, and
+    /// the link was a `ShortcutsLink` — a system-drawn pill that reads as
+    /// chrome wherever it is put. The section is now an ordinary one: the same
+    /// grouped card as Notebooks, and a `Label` row that looks like the
+    /// notebook rows beside it.
+    ///
+    /// `ShortcutsLink` is what Apple gives you for this, so dropping it means
+    /// opening the Shortcuts app by hand. `shortcuts://` is that app's
+    /// documented URL scheme and needs no entitlement.
     ///
     /// FR-1.10: the tip must stay dismissed across launches, so its visibility
     /// is `@AppStorage` rather than `@State`. `SiriTipView` writes `false`
     /// through the binding when someone taps its close button, and that is the
     /// whole mechanism — there is nothing to remember to persist.
     ///
-    /// ⚠️ **Both are iOS-only.** `SiriTipView` and `ShortcutsLink` are
-    /// unavailable on macOS — where the Shortcuts app is reached from its own
-    /// menu, so there is nothing for the app to offer.
+    /// ⚠️ **iOS-only.** `SiriTipView` is unavailable on macOS, where the
+    /// Shortcuts app is reached from its own menu, so there is nothing for the
+    /// app to offer. The whole section disappears there rather than leaving an
+    /// empty header behind.
+    ///
+    /// ⚠️ `SiriTipView` collapses to nothing inside a `List` row if the row
+    /// insets and background are cleared. It draws its own card, so clearing
+    /// them looks right on paper; it is left as an ordinary row because that
+    /// is the version that renders.
     @ViewBuilder
-    private var sidebarFooter: some View {
+    private var siriSection: some View {
         #if os(iOS)
-        VStack(spacing: 8) {
+        Section("Siri & Shortcuts") {
             if showSiriTip {
                 SiriTipView(
                     intent: OpenTodaysEntryIntent(),
                     isVisible: $showSiriTip
                 )
             }
-            ShortcutsLink()
-                .shortcutsLinkStyle(.automaticOutline)
+            NavigationLink {
+                AvailableShortcutsView()
+            } label: {
+                Label("Your Shortcuts", systemImage: "list.bullet.rectangle")
+            }
+            Button {
+                if let url = Self.shortcutsAppURL { openURL(url) }
+            } label: {
+                Label {
+                    Text("\(Self.appDisplayName) shortcuts")
+                } icon: {
+                    Self.shortcutsIcon
+                }
+            }
+            // Without this the row is drawn as a button — tinted label, no
+            // row highlight — and stops matching the notebook rows above it.
+            .buttonStyle(.plain)
         }
-        .padding(.horizontal)
-        .padding(.bottom, 8)
+        #endif
+    }
+
+    // MARK: - Replicating ShortcutsLink
+
+    /// Where `ShortcutsLink` actually goes.
+    ///
+    /// Not `shortcuts://`, which lands on the library root. The framework opens
+    /// `shortcuts://app?bundleID=<our bundle id>`, which opens the app's *own*
+    /// page in the Shortcuts library — the four App Shortcuts, not a list of
+    /// every app on the phone.
+    ///
+    /// 🧪 Read out of `_AppIntents_SwiftUI.framework` in the iOS 27 runtime:
+    /// the binary carries the literal `shortcuts://app?bundleID=` next to
+    /// `bundleIdentifier` and `openURL:options:completionHandler:`.
+    ///
+    /// Built with `URLComponents` rather than string interpolation so a bundle
+    /// id needing escaping cannot produce a malformed URL.
+    private static var shortcutsAppURL: URL? {
+        guard let bundleID = Bundle.main.bundleIdentifier else { return nil }
+        var components = URLComponents()
+        components.scheme = "shortcuts"
+        components.host = "app"
+        components.queryItems = [URLQueryItem(name: "bundleID", value: bundleID)]
+        return components.url
+    }
+
+    /// The name `ShortcutsLink` interpolates into its title.
+    private static var appDisplayName: String {
+        let info = Bundle.main.infoDictionary
+        return info?["CFBundleDisplayName"] as? String
+            ?? info?["CFBundleName"] as? String
+            ?? "Sparrow"
+    }
+
+    /// The Shortcuts glyph the real button draws.
+    ///
+    /// ⚠️ It is Apple artwork, shipped as an asset named `Shortcuts` inside
+    /// `_AppIntents_SwiftUI.framework` — there is no SF Symbol of it and no
+    /// public API that vends it. Loading it by name out of a system framework
+    /// is undocumented and can break in any OS release, so this falls back to
+    /// an SF Symbol whenever the asset is not there. Neither branch copies
+    /// Apple's image into our bundle.
+    @ViewBuilder
+    private static var shortcutsIcon: some View {
+        #if os(iOS)
+        if let bundle = Bundle(identifier: "com.apple.-AppIntents-SwiftUI"),
+           let image = UIImage(named: "Shortcuts", in: bundle, with: nil) {
+            Image(uiImage: image)
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
+        } else {
+            Image(systemName: "square.stack.3d.down.right")
+        }
         #endif
     }
 
