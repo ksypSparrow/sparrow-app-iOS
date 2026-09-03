@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A29F3C778EC54D62A2F6A979 /* SparrowDomain */; };
 		D43B53BCDD3054D1E370C964 /* SparrowAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 62928E19BB104EDF276DE340 /* SparrowAssembly */; };
 		E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */ = {isa = PBXBuildFile; productRef = A561B186FC250430F1D14C2F /* ServiceContracts */; };
 /* End PBXBuildFile section */
@@ -29,7 +28,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */,
 				E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */,
 				D43B53BCDD3054D1E370C964 /* SparrowAssembly in Frameworks */,
 			);
@@ -74,7 +72,6 @@
 			);
 			name = Sparrow;
 			packageProductDependencies = (
-				A29F3C778EC54D62A2F6A979 /* SparrowDomain */,
 				A561B186FC250430F1D14C2F /* ServiceContracts */,
 				62928E19BB104EDF276DE340 /* SparrowAssembly */,
 			);
@@ -108,7 +105,6 @@
 			mainGroup = E50290A24C49A459B43487C5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */,
 				9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -168,6 +164,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Sparrow.entitlements;
+				// ⚠️ Required since sparrow-kit 1.2.0. Its binaryTargets are *dynamic*
+				// frameworks, which Xcode copies into Sparrow.app/Frameworks but does
+				// not add to the runpath on its own. Without this the app builds
+				// cleanly and then dies at launch with
+				// "Library not loaded: @rpath/SparrowDomain.framework/SparrowDomain".
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -219,6 +224,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Sparrow.entitlements;
+				// ⚠️ Required since sparrow-kit 1.2.0. Its binaryTargets are *dynamic*
+				// frameworks, which Xcode copies into Sparrow.app/Frameworks but does
+				// not add to the runpath on its own. Without this the app builds
+				// cleanly and then dies at launch with
+				// "Library not loaded: @rpath/SparrowDomain.framework/SparrowDomain".
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -267,15 +281,7 @@
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.0;
-			};
-		};
-		AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ksypSparrow/sparrow-domain";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -285,11 +291,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
 			productName = SparrowAssembly;
-		};
-		A29F3C778EC54D62A2F6A979 /* SparrowDomain */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */;
-			productName = SparrowDomain;
 		};
 		A561B186FC250430F1D14C2F /* ServiceContracts */ = {
 			isa = XCSwiftPackageProductDependency;
