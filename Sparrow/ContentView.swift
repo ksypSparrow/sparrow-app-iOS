@@ -55,14 +55,9 @@ struct ContentView: View {
                         }
                 }
             }
+            siriSection
         }
         .navigationTitle("Sparrow")
-        // ⚠️ FR-1.10 shipped broken through M12 because this line was missing.
-        // `sidebarFooter` existed, was correct, and was never referenced —
-        // and Swift does not warn about an unused private computed property,
-        // so nothing in twelve milestones of building said a word about it.
-        // Only running the app did.
-        .safeAreaInset(edge: .bottom) { sidebarFooter }
         .toolbar {
             Button("New Notebook", systemImage: "plus") {
                 creating = true
@@ -95,7 +90,12 @@ struct ContentView: View {
         }
     }
 
-    /// The Siri tip and the Shortcuts link.
+    /// The Siri tip and the Shortcuts link, as a section of the sidebar list.
+    ///
+    /// These used to float in a `.safeAreaInset` above the tab bar, pinned
+    /// over the content. A `ShortcutsLink` sitting on its own in mid-air reads
+    /// as system chrome rather than as part of the app, so both now live in a
+    /// titled section and scroll with everything else.
     ///
     /// FR-1.10: the tip must stay dismissed across launches, so its visibility
     /// is `@AppStorage` rather than `@State`. `SiriTipView` writes `false`
@@ -104,11 +104,12 @@ struct ContentView: View {
     ///
     /// ⚠️ **Both are iOS-only.** `SiriTipView` and `ShortcutsLink` are
     /// unavailable on macOS — where the Shortcuts app is reached from its own
-    /// menu, so there is nothing for the app to offer.
+    /// menu, so there is nothing for the app to offer. The whole section
+    /// disappears there rather than leaving an empty header behind.
     @ViewBuilder
-    private var sidebarFooter: some View {
+    private var siriSection: some View {
         #if os(iOS)
-        VStack(spacing: 8) {
+        Section("Siri & Shortcuts") {
             if showSiriTip {
                 SiriTipView(
                     intent: OpenTodaysEntryIntent(),
@@ -118,8 +119,6 @@ struct ContentView: View {
             ShortcutsLink()
                 .shortcutsLinkStyle(.automaticOutline)
         }
-        .padding(.horizontal)
-        .padding(.bottom, 8)
         #endif
     }
 
