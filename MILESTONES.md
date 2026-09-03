@@ -16,6 +16,76 @@ against **tagged** upstream releases rather than the workspace.
 Step 4 is the one people skip. Until it runs you have only built against
 working copies, and the tag you are about to trust has never been compiled.
 
+## M12 — release
+
+Built against **SparrowDomain 1.0.0**, **SparrowColdStorage 1.0.0**,
+**SparrowKit 1.0.0** — all pinned `.upToNextMajor`, now that each carries a
+compatibility promise.
+
+```
+   ✓  builds and runs with NO local packages in the workspace
+   ✓  the metadata gate passes on a clean Release build
+   ✓  10 intents · 4 entities · 4 queries extract
+   ✓  both locales train
+   ~  every FR and NFR demonstrated — see the accounting below
+```
+
+`Scripts/release-check.sh` makes the first two repeatable.
+
+### The requirements, honestly
+
+Built and verifiable here:
+
+| | | how |
+|---|---|---|
+| FR-1.3 | search by text | `"heron"` finds `"Herón"`, verified at every layer |
+| FR-1.4 | filter by property | `EntityPropertyQuery` → `NoteFilter` → bound SQL |
+| FR-1.9 | Apple schemas | five types carry `domain: notes` in the metadata |
+| NFR-1.1 | two languages | the NL trainer prints `for en` **and** `for fr` |
+| NFR-1.2 | registered in `App.init()` | never in a view lifecycle callback |
+| NFR-1.3 | stable identifiers | client-generated UUIDs and slugs, in storage |
+| NFR-1.4 | no embedded images | no `image`/`data` key under `entities` |
+
+**Built, but demonstrable only on a simulator or device:**
+
+| | | needs |
+|---|---|---|
+| FR-1.1 | create by voice, app terminated | the simulator UI |
+| FR-1.2 | tapping a Spotlight result opens the note | **a device** |
+| FR-1.5 | notebook picker with no typing | the simulator UI |
+| FR-1.6 | six suggested notes | the simulator UI |
+| FR-1.7 | four voice phrases | the simulator UI |
+| FR-1.8 | indexed and removed within 60 s | **a device** |
+| FR-1.10 | the tip stays dismissed | the simulator UI |
+
+⚠️ **The two blockers are unrelated**, and neither is a code problem:
+
+```
+   six items   the Shortcuts and Siri UI
+               sudo xcode-select -s /Applications/Xcode-beta.app/Contents/Developer
+
+   five items  physical hardware
+               Apple states Simulator indexing does not always match a device
+```
+
+Everything reachable from a build has been checked. What remains needs a person
+holding a phone, and saying otherwise would be the one thing this release
+should not do.
+
+### What shipped
+
+```
+   10 intents · 4 entities · 4 queries
+
+   NoteEntityQuery       334   base · string · property · indexed
+   NotebookEntityQuery    71   base · string · enumerable
+   TagEntityQuery         67   base · enumerable
+   AccountEntityQuery     67   base · enumerable
+
+   migrations on device: v1_initial · v2_note · v3_fts · v4_tags
+                         v5_daily_unique · v6_daily_day_from_observed
+```
+
 ## M11 — localization
 
 Verified against domain 0.6.0, cold-storage 0.8.0, kit 0.9.0.
