@@ -461,6 +461,23 @@
         }
       }
     },
+    "Sparrow Shortcuts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparrow Shortcuts"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourcis Sparrow"
+          }
+        }
+      }
+    },
     "Sparrow can't reach your notes right now.": {
       "extractionState": "manual",
       "localizations": {

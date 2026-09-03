@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var notebookName = ""
     /// FR-1.10. `@AppStorage`, so dismissal survives a launch.
     @AppStorage("showSiriTip") private var showSiriTip = true
+    @Environment(\.openURL) private var openURL
     @State private var creating = false
     @State private var renaming: Notebook?
 
@@ -90,22 +91,32 @@ struct ContentView: View {
         }
     }
 
-    /// The Siri tip and the Shortcuts link, as a section of the sidebar list.
+    /// The Siri tip and a plain row that opens the Shortcuts app.
     ///
-    /// These used to float in a `.safeAreaInset` above the tab bar, pinned
-    /// over the content. A `ShortcutsLink` sitting on its own in mid-air reads
-    /// as system chrome rather than as part of the app, so both now live in a
-    /// titled section and scroll with everything else.
+    /// These used to float in a `.safeAreaInset`, pinned over the content, and
+    /// the link was a `ShortcutsLink` — a system-drawn pill that reads as
+    /// chrome wherever it is put. The section is now an ordinary one: the same
+    /// grouped card as Notebooks, and a `Label` row that looks like the
+    /// notebook rows beside it.
+    ///
+    /// `ShortcutsLink` is what Apple gives you for this, so dropping it means
+    /// opening the Shortcuts app by hand. `shortcuts://` is that app's
+    /// documented URL scheme and needs no entitlement.
     ///
     /// FR-1.10: the tip must stay dismissed across launches, so its visibility
     /// is `@AppStorage` rather than `@State`. `SiriTipView` writes `false`
     /// through the binding when someone taps its close button, and that is the
     /// whole mechanism — there is nothing to remember to persist.
     ///
-    /// ⚠️ **Both are iOS-only.** `SiriTipView` and `ShortcutsLink` are
-    /// unavailable on macOS — where the Shortcuts app is reached from its own
-    /// menu, so there is nothing for the app to offer. The whole section
-    /// disappears there rather than leaving an empty header behind.
+    /// ⚠️ **iOS-only.** `SiriTipView` is unavailable on macOS, where the
+    /// Shortcuts app is reached from its own menu, so there is nothing for the
+    /// app to offer. The whole section disappears there rather than leaving an
+    /// empty header behind.
+    ///
+    /// ⚠️ `SiriTipView` collapses to nothing inside a `List` row if the row
+    /// insets and background are cleared. It draws its own card, so clearing
+    /// them looks right on paper; it is left as an ordinary row because that
+    /// is the version that renders.
     @ViewBuilder
     private var siriSection: some View {
         #if os(iOS)
@@ -116,8 +127,14 @@ struct ContentView: View {
                     isVisible: $showSiriTip
                 )
             }
-            ShortcutsLink()
-                .shortcutsLinkStyle(.automaticOutline)
+            Button {
+                if let url = URL(string: "shortcuts://") { openURL(url) }
+            } label: {
+                Label("Sparrow Shortcuts", systemImage: "square.stack.3d.down.right")
+            }
+            // Without this the row is drawn as a button — tinted label, no
+            // row highlight — and stops matching the notebook rows above it.
+            .buttonStyle(.plain)
         }
         #endif
     }
