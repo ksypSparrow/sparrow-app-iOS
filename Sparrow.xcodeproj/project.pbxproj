@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */ = {isa = PBXBuildFile; productRef = A29F3C778EC54D62A2F6A979 /* SparrowDomain */; };
-		D43B53BCDD3054D1E370C964 /* ColdStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 62928E19BB104EDF276DE340 /* ColdStorage */; };
-		DEC0F1E299F44D8DCAB4777A /* Services in Frameworks */ = {isa = PBXBuildFile; productRef = 88B0E2F722A90E20634A2C3D /* Services */; };
+		D43B53BCDD3054D1E370C964 /* SparrowAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 62928E19BB104EDF276DE340 /* SparrowAssembly */; };
 		E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */ = {isa = PBXBuildFile; productRef = A561B186FC250430F1D14C2F /* ServiceContracts */; };
 /* End PBXBuildFile section */
 
@@ -32,8 +31,7 @@
 			files = (
 				A30E82D1A6C7A6C8B3120240 /* SparrowDomain in Frameworks */,
 				E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */,
-				DEC0F1E299F44D8DCAB4777A /* Services in Frameworks */,
-				D43B53BCDD3054D1E370C964 /* ColdStorage in Frameworks */,
+				D43B53BCDD3054D1E370C964 /* SparrowAssembly in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,8 +76,7 @@
 			packageProductDependencies = (
 				A29F3C778EC54D62A2F6A979 /* SparrowDomain */,
 				A561B186FC250430F1D14C2F /* ServiceContracts */,
-				88B0E2F722A90E20634A2C3D /* Services */,
-				62928E19BB104EDF276DE340 /* ColdStorage */,
+				62928E19BB104EDF276DE340 /* SparrowAssembly */,
 			);
 			productName = Sparrow;
 			productReference = 85673086EF6CFD3A1F8591AF /* Sparrow.app */;
@@ -112,7 +109,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */,
-				4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */,
 				9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -266,20 +262,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ksypSparrow/sparrow-cold-storage";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.1.0;
 			};
 		};
 		AD01E82E32DD68A5D46C8DED /* XCRemoteSwiftPackageReference "sparrow-domain" */ = {
@@ -293,15 +281,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		62928E19BB104EDF276DE340 /* ColdStorage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4917867DD03CF8DD86D27BFB /* XCRemoteSwiftPackageReference "sparrow-cold-storage" */;
-			productName = ColdStorage;
-		};
-		88B0E2F722A90E20634A2C3D /* Services */ = {
+		62928E19BB104EDF276DE340 /* SparrowAssembly */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
-			productName = Services;
+			productName = SparrowAssembly;
 		};
 		A29F3C778EC54D62A2F6A979 /* SparrowDomain */ = {
 			isa = XCSwiftPackageProductDependency;
