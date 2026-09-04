@@ -36,10 +36,10 @@ extension NoteEntityQuery: EntityPropertyQuery {
         }
         Property(\NoteEntity.$modificationDate) {
             GreaterThanOrEqualToComparator { since in
-                NoteFilter(updatedWithin: .from(since ?? .distantPast))
+                NoteFilter(updatedWithin: .from(since))
             }
             LessThanOrEqualToComparator { until in
-                NoteFilter(updatedWithin: .until(until ?? .distantFuture))
+                NoteFilter(updatedWithin: .until(until))
             }
         }
     }

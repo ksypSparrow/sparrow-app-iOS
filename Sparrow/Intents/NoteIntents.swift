@@ -1,4 +1,5 @@
 import AppIntents
+import UniformTypeIdentifiers
 import Foundation
 import SparrowKit
 
@@ -63,7 +64,7 @@ struct UpdateNoteIntent {
     /// and required to be **optional** here, unlike on `createNote`, where the
     /// same parameter must not be. The two schemas differ, and only the
     /// extractor says so.
-    @Parameter(title: "Attachments", supportedTypeIdentifiers: ["public.item"])
+    @Parameter(title: "Attachments", supportedContentTypes: [.item])
     var attachments: [IntentFile]?
 
     @Dependency var notes: any NoteServicing

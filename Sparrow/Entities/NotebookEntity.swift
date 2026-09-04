@@ -15,11 +15,6 @@ import SparrowKit
 /// choosing the nouns.
 @AppEntity(schema: .notes.folder)
 struct NotebookEntity {
-    static let typeDisplayRepresentation = TypeDisplayRepresentation(
-        name: "Notebook",
-        numericFormat: "\(placeholder: .int) notebooks"
-    )
-
     static let defaultQuery = NotebookEntityQuery()
 
     let id: UUID

@@ -13,10 +13,6 @@ import Foundation
 /// them thinly or you do not get the schema.
 @AppEntity(schema: .notes.account)
 struct AccountEntity {
-    static let typeDisplayRepresentation = TypeDisplayRepresentation(
-        name: "Account"
-    )
-
     static let defaultQuery = AccountEntityQuery()
 
     /// Fixed, like `DefaultNotebook.identifier` and for the same reason: a
