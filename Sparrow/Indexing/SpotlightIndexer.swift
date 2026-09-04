@@ -57,6 +57,13 @@ actor SpotlightIndexer {
                 // its threshold, so rebuilding is the cheaper answer than
                 // reconciling thousands of identifiers one at a time.
                 await reindexEverything()
+            // ⚠️ Required since ServiceContracts became a resilient binary.
+            // Rebuilding is the correct answer, not a guess: an unrecognised
+            // change means the index may be wrong in ways we cannot name, and
+            // a stale Spotlight entry is the failure this class exists to
+            // prevent.
+            @unknown default:
+                await reindexEverything()
             }
         }
     }

@@ -13,9 +13,17 @@ enum SparrowIntentError: Error, CustomLocalizedStringResourceConvertible {
     case service(ServiceError)
 
     var localizedStringResource: LocalizedStringResource {
-        // Exhaustive on purpose: when `ServiceError` gains a case, this stops
-        // compiling. A `default:` here would ship the new failure to a person
-        // as silence.
+        // ⚠️ This was exhaustive on purpose — a new `ServiceError` case used
+        // to stop the build here, so nobody could ship a failure to a person
+        // as silence. `ServiceContracts` is now consumed as a resilient
+        // binary, which un-freezes the enum and forces the `@unknown default`
+        // below, so that guarantee is gone.
+        //
+        // The fallback is deliberately a real sentence rather than silence,
+        // which keeps the *product* behaviour the comment was protecting. What
+        // is lost is the compile-time check. Freezing `ServiceError` in
+        // ServiceContracts would restore it, at the cost of making every added
+        // case a breaking change for the other team consuming the binaries.
         switch self {
         case .service(.emptyNote):
             "A note needs a title or some text."
@@ -33,6 +41,8 @@ enum SparrowIntentError: Error, CustomLocalizedStringResourceConvertible {
             "That tag no longer exists."
         case .service(.storageUnavailable):
             "Sparrow can't reach your notes right now."
+        @unknown default:
+            "Something went wrong."
         }
     }
 }

@@ -7,12 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D43B53BCDD3054D1E370C964 /* SparrowAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 62928E19BB104EDF276DE340 /* SparrowAssembly */; };
-		E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */ = {isa = PBXBuildFile; productRef = A561B186FC250430F1D14C2F /* ServiceContracts */; };
+		11B08D14D0F94AD0BD05F6D6 /* SparrowDomain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */; };
+		40DDA21D8972C9A5069D0A1B /* SparrowDomain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5B813D3885480AC450E207A0 /* StorageContracts.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */; };
+		90002E68006846B7648EA9EC /* StorageContracts.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2630A7CF111DF077EB681B23 /* ColdStorage.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5457D9DB9511E33873847487 /* ColdStorage.xcframework */; };
+		AA7F3E1C45A694D2CE075E55 /* ColdStorage.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5457D9DB9511E33873847487 /* ColdStorage.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2A9A274C1F7ED7A9936C4FE6 /* ServiceContracts.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */; };
+		98D34CB283908EF7CEAD6F0A /* ServiceContracts.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C4F974BA359A442CCE6712D /* Services.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 110F55C6F94B568343806FE6 /* Services.xcframework */; };
+		F15F99002CB2C1A6892B1717 /* Services.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 110F55C6F94B568343806FE6 /* Services.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		16D3DCB64A5D9D93420213DF /* SparrowAssembly.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */; };
+		993B63E058052F31C957F692 /* SparrowAssembly.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		85673086EF6CFD3A1F8591AF /* Sparrow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sparrow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SparrowDomain.xcframework; path = Frameworks/SparrowDomain.xcframework; sourceTree = "<group>"; };
+		FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = StorageContracts.xcframework; path = Frameworks/StorageContracts.xcframework; sourceTree = "<group>"; };
+		5457D9DB9511E33873847487 /* ColdStorage.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ColdStorage.xcframework; path = Frameworks/ColdStorage.xcframework; sourceTree = "<group>"; };
+		2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ServiceContracts.xcframework; path = Frameworks/ServiceContracts.xcframework; sourceTree = "<group>"; };
+		110F55C6F94B568343806FE6 /* Services.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Services.xcframework; path = Frameworks/Services.xcframework; sourceTree = "<group>"; };
+		1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SparrowAssembly.xcframework; path = Frameworks/SparrowAssembly.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,19 +39,55 @@
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		34EC437E5837D0D5F6E620DD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				40DDA21D8972C9A5069D0A1B /* SparrowDomain.xcframework in Embed Frameworks */,
+				90002E68006846B7648EA9EC /* StorageContracts.xcframework in Embed Frameworks */,
+				AA7F3E1C45A694D2CE075E55 /* ColdStorage.xcframework in Embed Frameworks */,
+				98D34CB283908EF7CEAD6F0A /* ServiceContracts.xcframework in Embed Frameworks */,
+				F15F99002CB2C1A6892B1717 /* Services.xcframework in Embed Frameworks */,
+				993B63E058052F31C957F692 /* SparrowAssembly.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		7561BFB015D8F536760CB671 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7A6FCFF0F56876520FE79D5 /* ServiceContracts in Frameworks */,
-				D43B53BCDD3054D1E370C964 /* SparrowAssembly in Frameworks */,
+				11B08D14D0F94AD0BD05F6D6 /* SparrowDomain.xcframework in Frameworks */,
+				5B813D3885480AC450E207A0 /* StorageContracts.xcframework in Frameworks */,
+				2630A7CF111DF077EB681B23 /* ColdStorage.xcframework in Frameworks */,
+				2A9A274C1F7ED7A9936C4FE6 /* ServiceContracts.xcframework in Frameworks */,
+				0C4F974BA359A442CCE6712D /* Services.xcframework in Frameworks */,
+				16D3DCB64A5D9D93420213DF /* SparrowAssembly.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F11FE163DD08A5A5A6291CE1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */,
+				FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */,
+				5457D9DB9511E33873847487 /* ColdStorage.xcframework */,
+				2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */,
+				110F55C6F94B568343806FE6 /* Services.xcframework */,
+				1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		328EC33DF3954DC9B83FA285 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -48,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				67D99A50C43AB7AF1197937A /* Sparrow */,
+				F11FE163DD08A5A5A6291CE1 /* Frameworks */,
 				328EC33DF3954DC9B83FA285 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +115,7 @@
 				BCE16DD0260827ECF338C787 /* Sources */,
 				7561BFB015D8F536760CB671 /* Frameworks */,
 				0189424A5A60FED329FA868E /* Resources */,
+				34EC437E5837D0D5F6E620DD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -71,10 +125,6 @@
 				67D99A50C43AB7AF1197937A /* Sparrow */,
 			);
 			name = Sparrow;
-			packageProductDependencies = (
-				A561B186FC250430F1D14C2F /* ServiceContracts */,
-				62928E19BB104EDF276DE340 /* SparrowAssembly */,
-			);
 			productName = Sparrow;
 			productReference = 85673086EF6CFD3A1F8591AF /* Sparrow.app */;
 			productType = "com.apple.product-type.application";
@@ -104,9 +154,6 @@
 			);
 			mainGroup = E50290A24C49A459B43487C5;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 328EC33DF3954DC9B83FA285 /* Products */;
 			projectDirPath = "";
@@ -164,6 +211,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Sparrow.entitlements;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				// ⚠️ Required since sparrow-kit 1.2.0. Its binaryTargets are *dynamic*
 				// frameworks, which Xcode copies into Sparrow.app/Frameworks but does
 				// not add to the runpath on its own. Without this the app builds
@@ -224,6 +275,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Sparrow.entitlements;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				// ⚠️ Required since sparrow-kit 1.2.0. Its binaryTargets are *dynamic*
 				// frameworks, which Xcode copies into Sparrow.app/Frameworks but does
 				// not add to the runpath on its own. Without this the app builds
@@ -275,29 +330,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ksypSparrow/sparrow-kit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		62928E19BB104EDF276DE340 /* SparrowAssembly */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
-			productName = SparrowAssembly;
-		};
-		A561B186FC250430F1D14C2F /* ServiceContracts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9B6062A1E282098577916469 /* XCRemoteSwiftPackageReference "sparrow-kit" */;
-			productName = ServiceContracts;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
 }
