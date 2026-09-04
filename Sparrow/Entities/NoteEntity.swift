@@ -23,11 +23,6 @@ import SparrowKit
 /// every intent written against the old names has to move with it.
 @AppEntity(schema: .notes.note)
 struct NoteEntity: IndexedEntity {
-    static let typeDisplayRepresentation = TypeDisplayRepresentation(
-        name: "Note",
-        numericFormat: "\(placeholder: .int) notes"
-    )
-
     static let defaultQuery = NoteEntityQuery()
 
     /// A client-generated `UUID`, stable across installs.
@@ -118,10 +113,11 @@ struct NoteEntity: IndexedEntity {
     }
     /// Sparrow's own: when the observation happened, which is not the same as
     /// when the note was created. Optional, being an extra.
-    @ComputedProperty(
-        title: "Observed",
-        indexingKey: \.contentCreationDate
-    ) var observedAt: Date? { note.observedAt }
+    /// ⚠️ No `indexingKey:` — the schema already maps `creationDate` onto
+    /// `contentCreationDate`, and two properties claiming one attribute is a
+    /// build warning. `attributeSet` below still writes `observedAt` there
+    /// deliberately, which is the mapping this app wants.
+    @ComputedProperty(title: "Observed") var observedAt: Date? { note.observedAt }
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(

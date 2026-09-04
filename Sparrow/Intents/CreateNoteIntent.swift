@@ -1,4 +1,5 @@
 import AppIntents
+import UniformTypeIdentifiers
 import SparrowKit
 
 /// Captures a note without opening the app.
@@ -30,9 +31,10 @@ struct CreateNoteIntent {
 
     @Parameter(title: "Content") var content: AttributedString?
 
-    /// `supportedTypeIdentifiers` is mandatory: the extractor refuses an
-    /// attachment parameter that does not say what it accepts.
-    @Parameter(title: "Attachments", supportedTypeIdentifiers: ["public.item"])
+    /// Declaring what it accepts is mandatory: the extractor refuses an
+    /// attachment parameter that does not. `supportedTypeIdentifiers` was
+    /// deprecated in iOS 18 in favour of `supportedContentTypes`.
+    @Parameter(title: "Attachments", supportedContentTypes: [.item])
     var attachments: [IntentFile]
 
     @Parameter(title: "Pinned") var isPinned: Bool
