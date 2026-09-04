@@ -1,7 +1,6 @@
 import AppIntents
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// Opens the app on a note.
 struct OpenNoteIntent: OpenIntent {

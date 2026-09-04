@@ -1,7 +1,6 @@
 import AppIntents
 import Foundation
-import ServiceContracts
-import SparrowAssembly
+import SparrowKit
 
 /// Where the app collects its dependencies and hands them to the system.
 ///

@@ -1,4 +1,4 @@
-import SparrowDomain
+import SparrowKit
 import SwiftUI
 
 /// The tags on a note, drawn as chips.

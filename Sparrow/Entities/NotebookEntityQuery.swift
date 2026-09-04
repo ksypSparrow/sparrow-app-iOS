@@ -1,7 +1,6 @@
 import AppIntents
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// How Shortcuts and Siri find notebooks.
 ///

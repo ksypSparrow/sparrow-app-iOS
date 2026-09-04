@@ -1,8 +1,7 @@
 import AppIntents
 import CoreSpotlight
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// How Shortcuts and Siri find notes.
 ///

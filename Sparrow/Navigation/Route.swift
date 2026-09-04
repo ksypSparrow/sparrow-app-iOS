@@ -1,4 +1,4 @@
-import SparrowDomain
+import SparrowKit
 
 /// Every screen an intent or the UI can land on.
 ///

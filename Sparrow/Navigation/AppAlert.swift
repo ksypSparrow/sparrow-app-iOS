@@ -1,4 +1,4 @@
-import SparrowDomain
+import SparrowKit
 
 /// Everything the app can put in front of someone.
 enum AppAlert: Identifiable, Hashable {

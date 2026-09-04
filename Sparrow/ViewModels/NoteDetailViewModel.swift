@@ -1,6 +1,5 @@
 import Observation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 @MainActor
 @Observable

@@ -1,7 +1,6 @@
 import AppIntents
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// Searches notes without opening the app.
 ///

@@ -1,6 +1,6 @@
 import AppIntents
 import Foundation
-import SparrowDomain
+import SparrowKit
 
 /// A notebook, as the system sees it.
 ///

@@ -1,0 +1,14 @@
+# Vendored XCFrameworks from the sparrow-domain, sparrow-cold-storage and
+# sparrow-kit releases. ~34 MB, and they change wholesale on every release —
+# exactly what Git is worst at storing.
+#
+# ⚠️ Everything under Frameworks/ is tracked, not just the Mach-O binaries. The
+# executables inside a .framework have no extension, so a pattern that tried to
+# match by suffix would miss precisely the large files. A few small text files
+# (Info.plist, .swiftinterface) go to LFS as collateral; that is the cheaper
+# mistake.
+#
+# ⚠️ A clone without git-lfs installed gets 130-byte pointer files that Xcode
+# will try to link, failing with an unhelpful "not a valid Mach-O". Run
+# `git lfs install` before the first clone.
+Frameworks/** filter=lfs diff=lfs merge=lfs -text

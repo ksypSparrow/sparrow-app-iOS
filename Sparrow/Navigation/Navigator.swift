@@ -1,6 +1,6 @@
 import Foundation
 import Observation
-import SparrowDomain
+import SparrowKit
 
 /// Where the app is looking, and what it is asking.
 ///

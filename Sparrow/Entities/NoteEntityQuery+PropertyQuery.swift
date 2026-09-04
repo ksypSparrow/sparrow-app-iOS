@@ -4,8 +4,7 @@
 // same way, for the same reason.
 @preconcurrency import AppIntents
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// The Shortcuts **Find Notes** action — FR-1.4.
 ///
