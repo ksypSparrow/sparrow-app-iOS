@@ -1,8 +1,7 @@
 import AppIntents
 import CoreSpotlight
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// Keeps Spotlight in step with the notes.
 ///

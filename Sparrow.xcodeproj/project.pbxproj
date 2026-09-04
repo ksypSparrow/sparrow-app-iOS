@@ -7,28 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		11B08D14D0F94AD0BD05F6D6 /* SparrowDomain.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */; };
-		40DDA21D8972C9A5069D0A1B /* SparrowDomain.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5B813D3885480AC450E207A0 /* StorageContracts.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */; };
-		90002E68006846B7648EA9EC /* StorageContracts.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		2630A7CF111DF077EB681B23 /* ColdStorage.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5457D9DB9511E33873847487 /* ColdStorage.xcframework */; };
-		AA7F3E1C45A694D2CE075E55 /* ColdStorage.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5457D9DB9511E33873847487 /* ColdStorage.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		2A9A274C1F7ED7A9936C4FE6 /* ServiceContracts.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */; };
-		98D34CB283908EF7CEAD6F0A /* ServiceContracts.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0C4F974BA359A442CCE6712D /* Services.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 110F55C6F94B568343806FE6 /* Services.xcframework */; };
-		F15F99002CB2C1A6892B1717 /* Services.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 110F55C6F94B568343806FE6 /* Services.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		16D3DCB64A5D9D93420213DF /* SparrowAssembly.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */; };
-		993B63E058052F31C957F692 /* SparrowAssembly.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EB5544CE326EC7DD9DDADCFF /* SparrowKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0A2597C7593FB74F8A59211 /* SparrowKit.xcframework */; };
+		15E5969FBD1C4A5F2E7C6B75 /* SparrowKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0A2597C7593FB74F8A59211 /* SparrowKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		85673086EF6CFD3A1F8591AF /* Sparrow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sparrow.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SparrowDomain.xcframework; path = Frameworks/SparrowDomain.xcframework; sourceTree = "<group>"; };
-		FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = StorageContracts.xcframework; path = Frameworks/StorageContracts.xcframework; sourceTree = "<group>"; };
-		5457D9DB9511E33873847487 /* ColdStorage.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ColdStorage.xcframework; path = Frameworks/ColdStorage.xcframework; sourceTree = "<group>"; };
-		2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ServiceContracts.xcframework; path = Frameworks/ServiceContracts.xcframework; sourceTree = "<group>"; };
-		110F55C6F94B568343806FE6 /* Services.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Services.xcframework; path = Frameworks/Services.xcframework; sourceTree = "<group>"; };
-		1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SparrowAssembly.xcframework; path = Frameworks/SparrowAssembly.xcframework; sourceTree = "<group>"; };
+		A0A2597C7593FB74F8A59211 /* SparrowKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SparrowKit.xcframework; path = Frameworks/SparrowKit.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -46,13 +31,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				40DDA21D8972C9A5069D0A1B /* SparrowDomain.xcframework in Embed Frameworks */,
-				90002E68006846B7648EA9EC /* StorageContracts.xcframework in Embed Frameworks */,
-				AA7F3E1C45A694D2CE075E55 /* ColdStorage.xcframework in Embed Frameworks */,
-				98D34CB283908EF7CEAD6F0A /* ServiceContracts.xcframework in Embed Frameworks */,
-				F15F99002CB2C1A6892B1717 /* Services.xcframework in Embed Frameworks */,
-				993B63E058052F31C957F692 /* SparrowAssembly.xcframework in Embed Frameworks */,
-			);
+				15E5969FBD1C4A5F2E7C6B75 /* SparrowKit.xcframework in Embed Frameworks */,
+															);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,13 +43,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11B08D14D0F94AD0BD05F6D6 /* SparrowDomain.xcframework in Frameworks */,
-				5B813D3885480AC450E207A0 /* StorageContracts.xcframework in Frameworks */,
-				2630A7CF111DF077EB681B23 /* ColdStorage.xcframework in Frameworks */,
-				2A9A274C1F7ED7A9936C4FE6 /* ServiceContracts.xcframework in Frameworks */,
-				0C4F974BA359A442CCE6712D /* Services.xcframework in Frameworks */,
-				16D3DCB64A5D9D93420213DF /* SparrowAssembly.xcframework in Frameworks */,
-			);
+				EB5544CE326EC7DD9DDADCFF /* SparrowKit.xcframework in Frameworks */,
+															);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -78,13 +53,8 @@
 		F11FE163DD08A5A5A6291CE1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				47B5E3F437261922FF3A9973 /* SparrowDomain.xcframework */,
-				FC0ED02540CF8AB87691FB94 /* StorageContracts.xcframework */,
-				5457D9DB9511E33873847487 /* ColdStorage.xcframework */,
-				2E40286681FE9D9AE50DF5F4 /* ServiceContracts.xcframework */,
-				110F55C6F94B568343806FE6 /* Services.xcframework */,
-				1D3745BCC029E19E697D1118 /* SparrowAssembly.xcframework */,
-			);
+				A0A2597C7593FB74F8A59211 /* SparrowKit.xcframework */,
+															);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};

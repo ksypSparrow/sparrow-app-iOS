@@ -1,6 +1,6 @@
 import AppIntents
 import Foundation
-import ServiceContracts
+import SparrowKit
 
 /// The App Intents layer's own error type.
 ///

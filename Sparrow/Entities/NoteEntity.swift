@@ -1,7 +1,7 @@
 import AppIntents
 import CoreSpotlight
 import Foundation
-import SparrowDomain
+import SparrowKit
 
 /// A note, as the system sees it.
 ///

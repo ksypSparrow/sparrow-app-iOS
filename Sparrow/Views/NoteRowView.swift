@@ -1,4 +1,4 @@
-import SparrowDomain
+import SparrowKit
 import SwiftUI
 
 /// One line of the note list.

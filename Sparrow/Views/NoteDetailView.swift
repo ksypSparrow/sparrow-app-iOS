@@ -1,4 +1,4 @@
-import SparrowDomain
+import SparrowKit
 import SwiftUI
 
 struct NoteDetailView: View {

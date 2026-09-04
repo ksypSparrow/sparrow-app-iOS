@@ -1,4 +1,4 @@
-import ServiceContracts
+import SparrowKit
 
 /// The services a view model needs, in one value.
 ///

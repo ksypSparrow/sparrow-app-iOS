@@ -1,6 +1,5 @@
 import AppIntents
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// Captures a note without opening the app.
 ///

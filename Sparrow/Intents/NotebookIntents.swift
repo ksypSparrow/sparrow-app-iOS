@@ -1,7 +1,6 @@
 import AppIntents
 import Foundation
-import ServiceContracts
-import SparrowDomain
+import SparrowKit
 
 /// Creates a notebook without opening the app.
 struct CreateNotebookIntent: AppIntent {
